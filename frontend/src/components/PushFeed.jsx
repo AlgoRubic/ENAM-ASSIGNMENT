@@ -7,7 +7,10 @@ import {
   ExternalLink, 
   SlidersHorizontal,
   FileText,
-  Calendar
+  Calendar,
+  Sparkles,
+  Zap,
+  Activity
 } from 'lucide-react';
 
 export default function PushFeed({ 
@@ -21,6 +24,8 @@ export default function PushFeed({
   onOpenSettings
 }) {
   const [showRoutine, setShowRoutine] = useState(false);
+  const [alertFilter, setAlertFilter] = useState('all'); // 'all' | 'market' | 'filings'
+  const [showAllAlerts, setShowAllAlerts] = useState(false);
 
   const windows = [
     { label: '24h', value: 24, description: 'Today' },
@@ -30,32 +35,46 @@ export default function PushFeed({
   ];
 
   const getTimelineSummary = () => {
-    const total = digest?.high_signal_announcements?.length || 0;
+    const totalEvents = digest?.high_signal_announcements?.length || 0;
+    const totalAlerts = alerts?.length || 0;
     if (windowHours <= 24) {
       return {
         title: "Today's Intraday & Overnight Feed",
-        sub: `${total} high-conviction events surfaced from today's market close.`
+        sub: `${totalAlerts} triggered alerts • ${totalEvents} material exchange filings.`
       };
     } else if (windowHours <= 48) {
       return {
         title: "Trailing 48-Hour Digest",
-        sub: `${total} disclosures including yesterday's quarterly earnings & Board approvals.`
+        sub: `${totalAlerts} triggered alerts • ${totalEvents} disclosures including yesterday's close.`
       };
     } else if (windowHours <= 168) {
       return {
         title: "Weekly Portfolio Review (7 Days)",
-        sub: `Comprehensive dossier of ${total} material corporate actions across the portfolio.`
+        sub: `${totalAlerts} triggered alerts • ${totalEvents} material corporate actions across the portfolio.`
       };
     }
     return {
       title: "Cumulative Corporate Timeline",
-      sub: `All ${total} verified disclosures across portfolio holdings.`
+      sub: `Full archive: ${totalAlerts} threshold alerts • ${totalEvents} verified disclosures.`
     };
   };
 
   const timelineInfo = getTimelineSummary();
 
-  // Group announcements by Date Group (Today / Yesterday / Earlier this Week)
+  // Filter alerts by sub-type
+  const marketAlerts = alerts.filter(a => a.alert_type !== 'MATERIAL_FILING');
+  const filingAlerts = alerts.filter(a => a.alert_type === 'MATERIAL_FILING');
+
+  const displayedAlertsPool = alertFilter === 'market' 
+    ? marketAlerts 
+    : alertFilter === 'filings' 
+    ? filingAlerts 
+    : alerts;
+
+  // Limit preview to 4 or 6 unless "showAllAlerts" is expanded
+  const visibleAlerts = showAllAlerts ? displayedAlertsPool : displayedAlertsPool.slice(0, 5);
+
+  // Group announcements by Date Group
   const groupedAnnouncements = (digest?.high_signal_announcements || []).reduce((acc, item) => {
     const group = item.dateGroup || (item.timestamp?.includes('hour') ? 'Today' : item.timestamp?.includes('Yesterday') ? 'Yesterday' : 'Earlier this Week');
     if (!acc[group]) acc[group] = [];
@@ -109,19 +128,21 @@ export default function PushFeed({
           </div>
         </div>
         <div className="text-right flex-shrink-0 pl-2">
-          <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-white/[0.08] text-[#f5f5f7]">
-            {digest?.high_signal_announcements?.length || 0} Events
+          <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-white/[0.08] text-[#f5f5f7]">
+            {alerts.length} Alerts
           </span>
         </div>
       </div>
 
-      {/* Triggered EOD Alerts */}
+      {/* TRIGGERED ALERTS (Expanded, Timeline-Aware, and Sub-Filtered) */}
       {alerts && alerts.length > 0 && (
         <div className="space-y-2.5">
           <div className="flex items-center justify-between px-1">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">
-              Triggered Alerts ({alerts.length})
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">
+                Triggered Alerts ({alerts.length})
+              </span>
+            </div>
             <button
               onClick={onOpenSettings}
               className="text-[11px] text-[#86868b] hover:text-white transition-colors flex items-center gap-1"
@@ -131,64 +152,132 @@ export default function PushFeed({
             </button>
           </div>
 
+          {/* Sub-Filters: All | Price & Vol | Material Filings */}
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
+            <button
+              onClick={() => setAlertFilter('all')}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
+                alertFilter === 'all'
+                  ? 'bg-white text-black font-semibold'
+                  : 'bg-[#1c1c1e] text-[#86868b] hover:text-white'
+              }`}
+            >
+              All Alerts ({alerts.length})
+            </button>
+            <button
+              onClick={() => setAlertFilter('market')}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
+                alertFilter === 'market'
+                  ? 'bg-white text-black font-semibold'
+                  : 'bg-[#1c1c1e] text-[#86868b] hover:text-white'
+              }`}
+            >
+              Price & Vol ({marketAlerts.length})
+            </button>
+            <button
+              onClick={() => setAlertFilter('filings')}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
+                alertFilter === 'filings'
+                  ? 'bg-white text-black font-semibold'
+                  : 'bg-[#1c1c1e] text-[#86868b] hover:text-white'
+              }`}
+            >
+              Material Filings ({filingAlerts.length})
+            </button>
+          </div>
+
+          {/* Alert Cards Stream */}
           <div className="space-y-2">
-            {alerts.map((alert) => {
-              const isPositive = alert.price_change_pct >= 0;
+            {visibleAlerts.map((alert) => {
+              const isFilingAlert = alert.alert_type === 'MATERIAL_FILING';
+              const isPositive = (alert.price_change_pct || 0) >= 0;
+
               return (
                 <div 
                   key={alert.id}
                   onClick={() => onSelectSymbol(alert.symbol)}
-                  className="cursor-pointer apple-card rounded-2xl p-4 hover:border-white/20 transition-all active:scale-[0.99]"
+                  className="cursor-pointer apple-card rounded-2xl p-4 hover:border-white/20 transition-all active:scale-[0.99] space-y-2"
                 >
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-[15px] font-semibold text-white tracking-tight">
+                        <span className="text-[14px] font-semibold text-white tracking-tight">
                           {alert.company_name}
                         </span>
                         <span className="text-[11px] font-mono text-[#86868b]">
                           {alert.symbol.replace('.NS', '')}
                         </span>
+                        {isFilingAlert ? (
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-[#2997ff] bg-[#2997ff]/10 px-2 py-0.5 rounded-md">
+                            {alert.category?.replace('_', ' ')}
+                          </span>
+                        ) : null}
                       </div>
-                      <div className="mt-1 flex items-center gap-2 text-xs">
-                        <span className="font-semibold text-white tabular-numbers">
-                          ₹{alert.current_price?.toLocaleString('en-IN')}
-                        </span>
-                        <span className={`inline-flex items-center font-semibold tabular-numbers ${
-                          isPositive ? 'text-[#30d158]' : 'text-[#ff453a]'
-                        }`}>
-                          {isPositive ? '+' : ''}{alert.price_change_pct}%
-                        </span>
-                        <span className="text-[#3a3a3c]">•</span>
-                        <span className="text-[11px] font-medium text-[#ff9f0a] bg-[#ff9f0a]/10 px-2 py-0.5 rounded-full">
-                          {alert.volume_multiplier}x Vol
-                        </span>
-                      </div>
+
+                      {/* Numbers / Sub-details */}
+                      {!isFilingAlert ? (
+                        <div className="mt-1 flex items-center gap-2 text-xs">
+                          <span className="font-semibold text-white tabular-numbers">
+                            ₹{alert.current_price?.toLocaleString('en-IN')}
+                          </span>
+                          <span className={`inline-flex items-center font-semibold tabular-numbers ${
+                            isPositive ? 'text-[#30d158]' : 'text-[#ff453a]'
+                          }`}>
+                            {isPositive ? '+' : ''}{alert.price_change_pct}%
+                          </span>
+                          <span className="text-[#3a3a3c]">•</span>
+                          <span className="text-[11px] font-medium text-[#ff9f0a] bg-[#ff9f0a]/10 px-2 py-0.5 rounded-full">
+                            {alert.volume_multiplier}x 20D Vol
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="mt-0.5 text-[11px] text-[#86868b] font-medium">
+                          {alert.title}
+                        </div>
+                      )}
                     </div>
 
-                    <div className={`p-1.5 rounded-full ${
-                      isPositive ? 'bg-[#30d158]/10 text-[#30d158]' : 'bg-[#ff453a]/10 text-[#ff453a]'
-                    }`}>
-                      {isPositive ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
-                    </div>
+                    {/* Icon Pill */}
+                    {!isFilingAlert ? (
+                      <div className={`p-1.5 rounded-full flex-shrink-0 ${
+                        isPositive ? 'bg-[#30d158]/10 text-[#30d158]' : 'bg-[#ff453a]/10 text-[#ff453a]'
+                      }`}>
+                        {isPositive ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
+                      </div>
+                    ) : (
+                      <div className="p-1.5 rounded-full bg-[#2997ff]/10 text-[#2997ff] flex-shrink-0">
+                        <Zap className="w-4 h-4" />
+                      </div>
+                    )}
                   </div>
 
-                  <p className="mt-2.5 text-[12px] text-[#a1a1a6] leading-relaxed">
+                  <p className="text-[12px] text-[#a1a1a6] leading-relaxed">
                     {alert.reasoning}
                   </p>
                 </div>
               );
             })}
           </div>
+
+          {/* Show All / Show Less Toggle Button */}
+          {displayedAlertsPool.length > 5 && (
+            <button
+              onClick={() => setShowAllAlerts(!showAllAlerts)}
+              className="w-full py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-xs font-medium text-[#86868b] hover:text-white transition-colors flex items-center justify-center gap-1"
+            >
+              <span>{showAllAlerts ? 'Show Less' : `View All ${displayedAlertsPool.length} Triggered Alerts`}</span>
+              {showAllAlerts ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            </button>
+          )}
         </div>
       )}
 
       {/* Corporate Filings Feed (Chronologically Grouped) */}
-      <div className="space-y-4">
+      <div className="space-y-4 pt-2">
         {Object.entries(groupedAnnouncements).map(([groupTitle, items]) => (
           <div key={groupTitle} className="space-y-2.5">
             
-            {/* Date Section Header (Apple Mail / News style) */}
+            {/* Date Section Header */}
             <div className="flex items-center gap-2 px-1 pt-1">
               <Calendar className="w-3 h-3 text-[#86868b]" />
               <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">

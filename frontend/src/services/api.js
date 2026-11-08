@@ -235,6 +235,150 @@ export const ROUTINE_ANNOUNCEMENTS = [
   }
 ];
 
+// Historical Master Pool of EOD Price & Volume Anomalies across the week
+export const ALL_HISTORICAL_EOD_ALERTS = [
+  {
+    id: "alert-zomato",
+    symbol: "ZOMATO.NS",
+    company_name: "Zomato Ltd (Eternal)",
+    hoursAgo: 4,
+    current_price: 264.50,
+    price_change_pct: 5.40,
+    volume: 64200000,
+    volume_avg_20d: 29000000,
+    volume_multiplier: 2.21,
+    alert_type: "VOLUME_AND_PRICE",
+    reasoning: "Heavy institutional accumulation: Volume reached 2.21x 20D average with +5.4% surge following Q2 results delivery.",
+    timestamp: "Today (EOD)"
+  },
+  {
+    id: "alert-tatamotors",
+    symbol: "TATAMOTORS.NS",
+    company_name: "Tata Motors",
+    hoursAgo: 14,
+    current_price: 812.60,
+    price_change_pct: 3.95,
+    volume: 28400000,
+    volume_avg_20d: 12100000,
+    volume_multiplier: 2.34,
+    alert_type: "VOLUME_AND_PRICE",
+    reasoning: "Volume surged to 2.34x 20D average on NCLT demerger approval clearance (+3.95%).",
+    timestamp: "Today (EOD)"
+  },
+  {
+    id: "alert-lt",
+    symbol: "LT.NS",
+    company_name: "Larsen & Toubro",
+    hoursAgo: 18,
+    current_price: 3640.00,
+    price_change_pct: 4.10,
+    volume: 5100000,
+    volume_avg_20d: 2200000,
+    volume_multiplier: 2.32,
+    alert_type: "VOLUME_AND_PRICE",
+    reasoning: "Mega-order win in Middle East propelled 2.32x volume spike and +4.10% price advance.",
+    timestamp: "Today (EOD)"
+  },
+  {
+    id: "alert-bajfinance",
+    symbol: "BAJFINANCE.NS",
+    company_name: "Bajaj Finance",
+    hoursAgo: 22,
+    current_price: 6850.00,
+    price_change_pct: -3.85,
+    volume: 2600000,
+    volume_avg_20d: 1150000,
+    volume_multiplier: 2.26,
+    alert_type: "VOLUME_AND_PRICE",
+    reasoning: "High-volume intraday selloff (-3.85%) crossing the ±3% alert limit on 2.26x average volume.",
+    timestamp: "Today (EOD)"
+  },
+  {
+    id: "alert-trent",
+    symbol: "TRENT.NS",
+    company_name: "Trent Ltd",
+    hoursAgo: 24,
+    current_price: 6480.00,
+    price_change_pct: 4.60,
+    volume: 3400000,
+    volume_avg_20d: 1500000,
+    volume_multiplier: 2.27,
+    alert_type: "PRICE_SURGE",
+    reasoning: "Strong retail momentum: Stock climbed +4.60% surpassing the threshold band.",
+    timestamp: "Today (EOD)"
+  },
+  {
+    id: "alert-reliance",
+    symbol: "RELIANCE.NS",
+    company_name: "Reliance Industries",
+    hoursAgo: 26,
+    current_price: 1284.50,
+    price_change_pct: 2.85,
+    volume: 18450000,
+    volume_avg_20d: 8200000,
+    volume_multiplier: 2.25,
+    alert_type: "HIGH_VOLUME",
+    reasoning: "Heavy post-earnings institutional accumulation: Volume touched 2.25x 20D average on tariff monetization.",
+    timestamp: "Yesterday (EOD)"
+  },
+  {
+    id: "alert-polycab",
+    symbol: "POLYCAB.NS",
+    company_name: "Polycab India",
+    hoursAgo: 40,
+    current_price: 6720.00,
+    price_change_pct: 3.15,
+    volume: 1420000,
+    volume_avg_20d: 620000,
+    volume_multiplier: 2.29,
+    alert_type: "VOLUME_AND_PRICE",
+    reasoning: "Greenfield EHV power cable capex approval sparked +3.15% gain on 2.29x 20D volume.",
+    timestamp: "Yesterday (EOD)"
+  },
+  {
+    id: "alert-hal",
+    symbol: "HAL.NS",
+    company_name: "Hindustan Aeronautics",
+    hoursAgo: 46,
+    current_price: 4350.00,
+    price_change_pct: 3.20,
+    volume: 4900000,
+    volume_avg_20d: 2100000,
+    volume_multiplier: 2.33,
+    alert_type: "PRICE_SURGE",
+    reasoning: "Interim dividend declaration triggered institutional buying: +3.20% daily gain.",
+    timestamp: "2 days ago (EOD)"
+  },
+  {
+    id: "alert-dixon",
+    symbol: "DIXON.NS",
+    company_name: "Dixon Technologies",
+    hoursAgo: 54,
+    current_price: 14950.00,
+    price_change_pct: 3.45,
+    volume: 890000,
+    volume_avg_20d: 380000,
+    volume_multiplier: 2.34,
+    alert_type: "VOLUME_AND_PRICE",
+    reasoning: "Display module JV announcement unlocked +3.45% move on 2.34x volume surge.",
+    timestamp: "3 days ago (EOD)"
+  },
+  {
+    id: "alert-kaynes",
+    symbol: "KAYNES.NS",
+    company_name: "Kaynes Technology",
+    hoursAgo: 64,
+    current_price: 5420.00,
+    price_change_pct: 6.20,
+    volume: 1250000,
+    volume_avg_20d: 480000,
+    volume_multiplier: 2.60,
+    alert_type: "VOLUME_AND_PRICE",
+    reasoning: "High-conviction electronics manufacturing breakout: +6.20% advance on 2.60x volume.",
+    timestamp: "3 days ago (EOD)"
+  }
+];
+
 export async function fetchPortfolio() {
   try {
     const res = await fetch(`${BASE_URL}/portfolio`, { signal: AbortSignal.timeout(3000) });
@@ -282,7 +426,6 @@ export async function fetchDigest(windowHours = 24, highSignalOnly = false, symb
     console.warn('Backend digest fetch failed, using dynamic timeline filter:', e.message);
   }
 
-  // Dynamic filter across the historical window
   const filteredHigh = ALL_ANNOUNCEMENTS.filter(item => {
     if (item.hoursAgo > windowHours) return false;
     if (symbol && item.symbol !== symbol) return false;
@@ -305,86 +448,54 @@ export async function fetchDigest(windowHours = 24, highSignalOnly = false, symb
   };
 }
 
-export async function fetchAlerts(volumeMult = 2.0, pricePct = 3.0) {
+export async function fetchAlerts(volumeMult = 2.0, pricePct = 3.0, windowHours = 24) {
   try {
     const res = await fetch(`${BASE_URL}/push/alerts?volume_mult=${volumeMult}&price_pct=${pricePct}`, {
       signal: AbortSignal.timeout(3000)
     });
     if (res.ok) return await res.json();
   } catch (e) {
-    console.warn('Backend alerts fetch failed, using fallback:', e.message);
+    console.warn('Backend alerts fetch failed, using dynamic timeline alert engine:', e.message);
   }
+
+  // Filter EOD Market Movement Alerts based on Volume, Price, and Timeline
+  const marketAlerts = ALL_HISTORICAL_EOD_ALERTS.filter(alert => {
+    if (alert.hoursAgo > windowHours) return false;
+    const passesVol = alert.volume_multiplier >= volumeMult;
+    const passesPrice = Math.abs(alert.price_change_pct) >= pricePct;
+    return passesVol || passesPrice;
+  });
+
+  // Filter Material Announcement Alerts (Results, M&A, Leadership, Litigation, Capex)
+  const filingAlerts = ALL_ANNOUNCEMENTS.filter(ann => {
+    if (ann.hoursAgo > windowHours) return false;
+    return ann.priority <= 2 || ann.is_material;
+  }).map(ann => ({
+    id: `alert-filing-${ann.id}`,
+    symbol: ann.symbol,
+    company_name: ann.company_name,
+    category: ann.category,
+    alert_type: "MATERIAL_FILING",
+    title: ann.title,
+    reasoning: `Material regulatory action: ${ann.summary_one_liner}`,
+    timestamp: ann.timestamp,
+    source_url: ann.source_url,
+    hoursAgo: ann.hoursAgo
+  }));
+
+  // Combined comprehensive alert stream
+  const allAlerts = [...marketAlerts, ...filingAlerts];
+
   return {
     volume_threshold: volumeMult,
     price_threshold_pct: pricePct,
-    alert_count: 5,
-    alerts: [
-      {
-        id: "alert-1",
-        symbol: "ZOMATO.NS",
-        company_name: "Zomato Ltd (Eternal)",
-        current_price: 264.50,
-        price_change_pct: 5.40,
-        volume: 64200000,
-        volume_avg_20d: 29000000,
-        volume_multiplier: 2.21,
-        alert_type: "VOLUME_AND_PRICE",
-        reasoning: "Heavy institutional accumulation: Volume at 2.21x 20D average with +5.4% daily price surge following Q2 results.",
-        timestamp: "Today (EOD)"
-      },
-      {
-        id: "alert-2",
-        symbol: "TATAMOTORS.NS",
-        company_name: "Tata Motors",
-        current_price: 812.60,
-        price_change_pct: 3.95,
-        volume: 28400000,
-        volume_avg_20d: 12100000,
-        volume_multiplier: 2.34,
-        alert_type: "VOLUME_AND_PRICE",
-        reasoning: "Volume surged to 2.34x 20D average on NCLT demerger approval clearance (+3.95%).",
-        timestamp: "Today (EOD)"
-      },
-      {
-        id: "alert-3",
-        symbol: "LT.NS",
-        company_name: "Larsen & Toubro",
-        current_price: 3640.00,
-        price_change_pct: 4.10,
-        volume: 5100000,
-        volume_avg_20d: 2200000,
-        volume_multiplier: 2.32,
-        alert_type: "VOLUME_AND_PRICE",
-        reasoning: "Mega-order win in Middle East propelled 2.32x volume spike and +4.10% price advance.",
-        timestamp: "Today (EOD)"
-      },
-      {
-        id: "alert-4",
-        symbol: "BAJFINANCE.NS",
-        company_name: "Bajaj Finance",
-        current_price: 6850.00,
-        price_change_pct: -3.85,
-        volume: 2600000,
-        volume_avg_20d: 1150000,
-        volume_multiplier: 2.26,
-        alert_type: "VOLUME_AND_PRICE",
-        reasoning: "High-volume intraday selloff (-3.85%) crossing the ±3% alert limit on 2.26x average volume.",
-        timestamp: "Today (EOD)"
-      },
-      {
-        id: "alert-5",
-        symbol: "TRENT.NS",
-        company_name: "Trent Ltd",
-        current_price: 6480.00,
-        price_change_pct: 4.60,
-        volume: 3400000,
-        volume_avg_20d: 1500000,
-        volume_multiplier: 2.27,
-        alert_type: "PRICE_SURGE",
-        reasoning: "Strong retail momentum: Stock climbed +4.60% surpassing the threshold band.",
-        timestamp: "Today (EOD)"
-      }
-    ]
+    window_hours: windowHours,
+    alert_count: allAlerts.length,
+    market_alert_count: marketAlerts.length,
+    filing_alert_count: filingAlerts.length,
+    alerts: allAlerts,
+    market_alerts: marketAlerts,
+    filing_alerts: filingAlerts
   };
 }
 

@@ -36,27 +36,27 @@ export default function App() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  // Load Initial Portfolio and Alerts
+  // Load Initial Portfolio
   useEffect(() => {
     async function loadInitial() {
       const pData = await fetchPortfolio();
       setPortfolio(pData.portfolio || []);
       setAdHocTickers(pData.ad_hoc_tickers || []);
-
-      const aData = await fetchAlerts(volumeThreshold, priceThreshold);
-      setAlerts(aData.alerts || []);
     }
     loadInitial();
   }, []);
 
-  // Load Digest when windowHours or highSignalOnly changes
+  // Re-fetch Digest and Alerts whenever windowHours, highSignalOnly, or thresholds change
   useEffect(() => {
-    async function loadDigest() {
+    async function syncFeedAndAlerts() {
       const dData = await fetchDigest(windowHours, highSignalOnly);
       setDigest(dData);
+
+      const aData = await fetchAlerts(volumeThreshold, priceThreshold, windowHours);
+      setAlerts(aData.alerts || []);
     }
-    loadDigest();
-  }, [windowHours, highSignalOnly]);
+    syncFeedAndAlerts();
+  }, [windowHours, highSignalOnly, volumeThreshold, priceThreshold]);
 
   // Load Analysis when selectedSymbol changes
   useEffect(() => {
