@@ -6,6 +6,235 @@
 
 const BASE_URL = 'http://localhost:8000/api';
 
+export const ALL_ANNOUNCEMENTS = [
+  {
+    id: "ann-zomato-q2",
+    symbol: "ZOMATO.NS",
+    company_name: "Zomato Ltd (Eternal)",
+    hoursAgo: 4,
+    timestamp: "4 hours ago",
+    dateGroup: "Today",
+    title: "Financial Results for the quarter ended September 30, 2026 - Outcome of Board Meeting",
+    category: "results",
+    priority: 1,
+    is_material: true,
+    summary_one_liner: "Q2 FY25 PAT surged +389% YoY to ₹176 Cr; Blinkit GOV scaled +122% YoY with dark store additions on track.",
+    results_breakdown: {
+      period: "Q2 FY25",
+      unit: "₹ Cr",
+      revenue: { current: 4799, previous_qoq: 4206, previous_yoy: 2848, delta_qoq_pct: 14.1, delta_yoy_pct: 68.5 },
+      ebitda: { current: 226, previous_qoq: 177, previous_yoy: -47, delta_qoq_pct: 27.7, delta_yoy_pct: 580.8 },
+      pbt: { current: 204, previous_qoq: 158, previous_yoy: 36, delta_qoq_pct: 29.1, delta_yoy_pct: 466.7 },
+      pat: { current: 176, previous_qoq: 142, previous_yoy: 36, delta_qoq_pct: 23.9, delta_yoy_pct: 388.9 },
+      ebitda_margin_pct: 4.71,
+      pat_margin_pct: 3.67,
+      key_takeaway: "Hyper-growth sustained in quick commerce (Blinkit) while food delivery adjusted EBITDA margin held resilient at 3.9%."
+    }
+  },
+  {
+    id: "ann-tcs-cfo",
+    symbol: "TCS.NS",
+    company_name: "Tata Consultancy Services",
+    hoursAgo: 9,
+    timestamp: "9 hours ago",
+    dateGroup: "Today",
+    title: "Appointment of Chief Financial Officer and Key Managerial Personnel",
+    category: "management_change",
+    priority: 1,
+    is_material: true,
+    summary_one_liner: "Milind Lakkad transitions; Samir Seksaria takes over as Chief Financial Officer.",
+    executive_bio: {
+      name: "Samir Seksaria",
+      role: "Chief Financial Officer (Incoming)",
+      incoming_or_outgoing: "incoming",
+      previous_firm: "Tata Sons & TCS Global Finance",
+      previous_role: "Head of Corporate FP&A",
+      career_summary: "Chartered Accountant with 24+ years at Tata Group; steered global treasury, cross-border M&A financing, and margin governance across US & European geos.",
+      linkedin_url: "https://linkedin.com",
+      strategic_implication: "Internal succession ensures zero disruption in shareholder capital allocation (80-100% free cash return policy intact)."
+    }
+  },
+  {
+    id: "ann-tatamotors-demerger",
+    symbol: "TATAMOTORS.NS",
+    company_name: "Tata Motors Ltd",
+    hoursAgo: 14,
+    timestamp: "14 hours ago",
+    dateGroup: "Today",
+    title: "NCLT approval update regarding Composite Scheme of Arrangement for Demerger of CV and PV",
+    category: "M&A",
+    priority: 1,
+    is_material: true,
+    summary_one_liner: "Demerger into two standalone listed entities (Commercial Vehicles vs. Passenger/EV/JLR) clears NCLT stakeholder review."
+  },
+  {
+    id: "ann-lt-order",
+    symbol: "LT.NS",
+    company_name: "Larsen & Toubro",
+    hoursAgo: 18,
+    timestamp: "18 hours ago",
+    dateGroup: "Today",
+    title: "Significant Mega-Order win (₹10,000 Cr+) for Hydrocarbon Business in the Middle East",
+    category: "capex",
+    priority: 2,
+    is_material: true,
+    summary_one_liner: "Secured major offshore gas processing project from Saudi Aramco; expands international backlog to all-time high."
+  },
+  {
+    id: "ann-bajfinance-rbi",
+    symbol: "BAJFINANCE.NS",
+    company_name: "Bajaj Finance",
+    hoursAgo: 22,
+    timestamp: "22 hours ago",
+    dateGroup: "Today",
+    title: "RBI lifts regulatory curbs on e-Commerce and Insta EMI Card sanctioning",
+    category: "litigation",
+    priority: 1,
+    is_material: true,
+    summary_one_liner: "Full clearance received from Reserve Bank of India to resume issuance and onboarding of digital customer credit lines."
+  },
+  {
+    id: "ann-reliance-results",
+    symbol: "RELIANCE.NS",
+    company_name: "Reliance Industries",
+    hoursAgo: 26,
+    timestamp: "Yesterday",
+    dateGroup: "Yesterday",
+    title: "Consolidated Financial Results for the Quarter and Half Year ended September 30, 2026",
+    category: "results",
+    priority: 1,
+    is_material: true,
+    summary_one_liner: "Consolidated EBITDA touched ₹43,934 Cr (+2.2% QoQ) driven by record Jio ARPU of ₹195.1 and steady Retail footfalls.",
+    results_breakdown: {
+      period: "Q2 FY25",
+      unit: "₹ Cr",
+      revenue: { current: 235481, previous_qoq: 236217, previous_yoy: 234956, delta_qoq_pct: -0.3, delta_yoy_pct: 0.2 },
+      ebitda: { current: 43934, previous_qoq: 42748, previous_yoy: 44867, delta_qoq_pct: 2.8, delta_yoy_pct: -2.1 },
+      pbt: { current: 26189, previous_qoq: 24867, previous_yoy: 28140, delta_qoq_pct: 5.3, delta_yoy_pct: -6.9 },
+      pat: { current: 19101, previous_qoq: 17445, previous_yoy: 19878, delta_qoq_pct: 9.5, delta_yoy_pct: -3.9 },
+      ebitda_margin_pct: 18.66,
+      pat_margin_pct: 8.11,
+      key_takeaway: "Tariff hikes in Jio drove 7.4% QoQ digital EBITDA growth, offsetting temporary weakness in O2C refining margins."
+    }
+  },
+  {
+    id: "ann-trent-store",
+    symbol: "TRENT.NS",
+    company_name: "Trent Ltd",
+    hoursAgo: 32,
+    timestamp: "Yesterday",
+    dateGroup: "Yesterday",
+    title: "Corporate Update: Opening of 500th Zudio Store & Entry into Middle East Market",
+    category: "press_release",
+    priority: 3,
+    is_material: true,
+    summary_one_liner: "Expanded retail footprint across tier-2/3 Indian cities; pilot international expansion launched in Dubai."
+  },
+  {
+    id: "ann-polycab-capex",
+    symbol: "POLYCAB.NS",
+    company_name: "Polycab India",
+    hoursAgo: 40,
+    timestamp: "Yesterday",
+    dateGroup: "Yesterday",
+    title: "Approval of Greenfield Facility in Gujarat for Extra-High Voltage (EHV) Power Cables",
+    category: "capex",
+    priority: 2,
+    is_material: true,
+    summary_one_liner: "Board sanctioned ₹1,200 Cr capex funded via internal accruals to address renewable grid & HVDC transmission demand."
+  },
+  {
+    id: "ann-hal-dividend",
+    symbol: "HAL.NS",
+    company_name: "Hindustan Aeronautics",
+    hoursAgo: 46,
+    timestamp: "2 days ago",
+    dateGroup: "Earlier this Week",
+    title: "Declaration of Interim Dividend of ₹22 per equity share and fixation of Record Date",
+    category: "dividend",
+    priority: 3,
+    is_material: true,
+    summary_one_liner: "Interim dividend ₹22/share (220% on FV ₹10); record date fixed as November 20, 2026."
+  },
+  {
+    id: "ann-dixon-jv",
+    symbol: "DIXON.NS",
+    company_name: "Dixon Technologies",
+    hoursAgo: 54,
+    timestamp: "3 days ago",
+    dateGroup: "Earlier this Week",
+    title: "Joint Venture Agreement with HKC Corporation for Display Module and Smartphone Components",
+    category: "M&A",
+    priority: 1,
+    is_material: true,
+    summary_one_liner: "50:50 JV to manufacture LCD/OLED display modules in India under PLI scheme; unlocks backward integration."
+  },
+  {
+    id: "ann-deepak-rating",
+    symbol: "DEEPAKNTR.NS",
+    company_name: "Deepak Nitrite",
+    hoursAgo: 68,
+    timestamp: "3 days ago",
+    dateGroup: "Earlier this Week",
+    title: "CRISIL reaffirms 'CRISIL AA+/Stable' rating on bank loan facilities and Commercial Paper",
+    category: "credit_rating",
+    priority: 3,
+    is_material: true,
+    summary_one_liner: "Credit rating reaffirmed at AA+/Stable citing strong domestic market position in phenol/acetone & net debt-free status."
+  }
+];
+
+export const ROUTINE_ANNOUNCEMENTS = [
+  {
+    id: "ann-hdfc-routine-esop",
+    symbol: "HDFCBANK.NS",
+    company_name: "HDFC Bank",
+    hoursAgo: 12,
+    timestamp: "12 hours ago",
+    title: "Allotment of 14,250 Equity Shares under Employees Stock Option Scheme",
+    category: "unclassified",
+    priority: 6,
+    is_material: false,
+    summary_one_liner: "Routine ESOP allotment (14,250 shares); nominal equity dilution of 0.00018%."
+  },
+  {
+    id: "ann-infy-routine-compliance",
+    symbol: "INFY.NS",
+    company_name: "Infosys",
+    hoursAgo: 16,
+    timestamp: "16 hours ago",
+    title: "Certificate under Regulation 74(5) of SEBI Regulations",
+    category: "unclassified",
+    priority: 6,
+    is_material: false,
+    summary_one_liner: "Quarterly depository participant confirmation certificate; zero material impact."
+  },
+  {
+    id: "ann-titan-investor-meet",
+    symbol: "TITAN.NS",
+    company_name: "Titan Company",
+    hoursAgo: 28,
+    timestamp: "Yesterday",
+    title: "Schedule of Institutional Investor Meeting / Analysts Interaction",
+    category: "investor_meetings",
+    priority: 4,
+    is_material: false,
+    summary_one_liner: "Group meeting scheduled with institutional funds in Mumbai; no unpublished price-sensitive info to be shared."
+  },
+  {
+    id: "ann-itc-postal-ballot",
+    symbol: "ITC.NS",
+    company_name: "ITC Ltd",
+    hoursAgo: 36,
+    timestamp: "Yesterday",
+    title: "Notice of Postal Ballot and E-voting Information for Hotel Demerger Approval",
+    category: "postal_ballot",
+    priority: 5,
+    is_material: false,
+    summary_one_liner: "E-voting opens for shareholder approval on the scheme of arrangement for ITC Hotels Ltd spin-off."
+  }
+];
+
 export async function fetchPortfolio() {
   try {
     const res = await fetch(`${BASE_URL}/portfolio`, { signal: AbortSignal.timeout(3000) });
@@ -50,115 +279,29 @@ export async function fetchDigest(windowHours = 24, highSignalOnly = false, symb
     const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
     if (res.ok) return await res.json();
   } catch (e) {
-    console.warn('Backend digest fetch failed, using fallback:', e.message);
+    console.warn('Backend digest fetch failed, using dynamic timeline filter:', e.message);
   }
+
+  // Dynamic filter across the historical window
+  const filteredHigh = ALL_ANNOUNCEMENTS.filter(item => {
+    if (item.hoursAgo > windowHours) return false;
+    if (symbol && item.symbol !== symbol) return false;
+    return true;
+  });
+
+  const filteredRoutine = ROUTINE_ANNOUNCEMENTS.filter(item => {
+    if (item.hoursAgo > windowHours) return false;
+    if (symbol && item.symbol !== symbol) return false;
+    return true;
+  });
+
   return {
     window_hours: windowHours,
-    total_announcements: 14,
-    material_count: 8,
-    collapsed_routine_count: 6,
-    high_signal_announcements: [
-      {
-        id: "ann-zomato-q2",
-        symbol: "ZOMATO.NS",
-        company_name: "Zomato Ltd (Eternal)",
-        timestamp: "4 hours ago",
-        title: "Financial Results for the quarter ended September 30, 2026 - Outcome of Board Meeting",
-        category: "results",
-        priority: 1,
-        is_material: true,
-        summary_one_liner: "Q2 FY25 PAT surged +389% YoY to ₹176 Cr; Blinkit GOV scaled +122% YoY with dark store additions on track.",
-        results_breakdown: {
-          period: "Q2 FY25",
-          unit: "₹ Cr",
-          revenue: { current: 4799, previous_qoq: 4206, previous_yoy: 2848, delta_qoq_pct: 14.1, delta_yoy_pct: 68.5 },
-          ebitda: { current: 226, previous_qoq: 177, previous_yoy: -47, delta_qoq_pct: 27.7, delta_yoy_pct: 580.8 },
-          pbt: { current: 204, previous_qoq: 158, previous_yoy: 36, delta_qoq_pct: 29.1, delta_yoy_pct: 466.7 },
-          pat: { current: 176, previous_qoq: 142, previous_yoy: 36, delta_qoq_pct: 23.9, delta_yoy_pct: 388.9 },
-          ebitda_margin_pct: 4.71,
-          pat_margin_pct: 3.67,
-          key_takeaway: "Hyper-growth sustained in quick commerce (Blinkit) while food delivery adjusted EBITDA margin held resilient at 3.9%."
-        }
-      },
-      {
-        id: "ann-tcs-cfo",
-        symbol: "TCS.NS",
-        company_name: "Tata Consultancy Services",
-        timestamp: "9 hours ago",
-        title: "Appointment of Chief Financial Officer and Key Managerial Personnel",
-        category: "management_change",
-        priority: 1,
-        is_material: true,
-        summary_one_liner: "Milind Lakkad transitions; Samir Seksaria takes over as Chief Financial Officer.",
-        executive_bio: {
-          name: "Samir Seksaria",
-          role: "Chief Financial Officer (Incoming)",
-          incoming_or_outgoing: "incoming",
-          previous_firm: "Tata Sons & TCS Global Finance",
-          previous_role: "Head of Corporate FP&A",
-          career_summary: "Chartered Accountant with 24+ years at Tata Group; steered global treasury, cross-border M&A financing, and margin governance across US & European geos.",
-          linkedin_url: "https://linkedin.com",
-          strategic_implication: "Internal succession ensures zero disruption in shareholder capital allocation (80-100% free cash return policy intact)."
-        }
-      },
-      {
-        id: "ann-tatamotors-demerger",
-        symbol: "TATAMOTORS.NS",
-        company_name: "Tata Motors Ltd",
-        timestamp: "14 hours ago",
-        title: "NCLT approval update regarding Composite Scheme of Arrangement for Demerger of CV and PV",
-        category: "M&A",
-        priority: 1,
-        is_material: true,
-        summary_one_liner: "Demerger into two standalone listed entities (Commercial Vehicles vs. Passenger/EV/JLR) clears NCLT stakeholder review."
-      },
-      {
-        id: "ann-lt-order",
-        symbol: "LT.NS",
-        company_name: "Larsen & Toubro",
-        timestamp: "18 hours ago",
-        title: "Significant Mega-Order win (₹10,000 Cr+) for Hydrocarbon Business in the Middle East",
-        category: "capex",
-        priority: 2,
-        is_material: true,
-        summary_one_liner: "Secured major offshore gas processing project from Saudi Aramco; expands international backlog to all-time high."
-      },
-      {
-        id: "ann-bajfinance-rbi",
-        symbol: "BAJFINANCE.NS",
-        company_name: "Bajaj Finance",
-        timestamp: "22 hours ago",
-        title: "RBI lifts regulatory curbs on e-Commerce and Insta EMI Card sanctioning",
-        category: "litigation",
-        priority: 1,
-        is_material: true,
-        summary_one_liner: "Full clearance received from Reserve Bank of India to resume issuance and onboarding of digital customer credit lines."
-      }
-    ],
-    routine_announcements: [
-      {
-        id: "ann-hdfc-routine-esop",
-        symbol: "HDFCBANK.NS",
-        company_name: "HDFC Bank",
-        timestamp: "12 hours ago",
-        title: "Allotment of 14,250 Equity Shares under Employees Stock Option Scheme",
-        category: "unclassified",
-        priority: 6,
-        is_material: false,
-        summary_one_liner: "Routine ESOP allotment (14,250 shares); nominal equity dilution of 0.00018%."
-      },
-      {
-        id: "ann-infy-routine-compliance",
-        symbol: "INFY.NS",
-        company_name: "Infosys",
-        timestamp: "16 hours ago",
-        title: "Certificate under Regulation 74(5) of SEBI Regulations",
-        category: "unclassified",
-        priority: 6,
-        is_material: false,
-        summary_one_liner: "Quarterly depository participant confirmation certificate; zero material impact."
-      }
-    ]
+    total_announcements: filteredHigh.length + filteredRoutine.length,
+    material_count: filteredHigh.length,
+    collapsed_routine_count: filteredRoutine.length,
+    high_signal_announcements: filteredHigh,
+    routine_announcements: highSignalOnly ? [] : filteredRoutine
   };
 }
 
@@ -254,7 +397,6 @@ export async function fetchCompanyAnalysis(symbol) {
   } catch (e) {
     console.warn(`Backend pull analysis failed for ${symbol}, using client fallback:`, e.message);
   }
-  // Return pre-packaged rich analysis for Zomato as demo base if offline
   return {
     symbol: symbol,
     company_name: symbol.includes("TATAMOTORS") ? "Tata Motors Ltd" : symbol.includes("RELIANCE") ? "Reliance Industries" : "Zomato Ltd (Eternal)",

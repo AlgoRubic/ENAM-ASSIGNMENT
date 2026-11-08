@@ -6,7 +6,8 @@ import {
   ChevronUp, 
   ExternalLink, 
   SlidersHorizontal,
-  FileText
+  FileText,
+  Calendar
 } from 'lucide-react';
 
 export default function PushFeed({ 
@@ -22,11 +23,45 @@ export default function PushFeed({
   const [showRoutine, setShowRoutine] = useState(false);
 
   const windows = [
-    { label: '24h', value: 24 },
-    { label: '48h', value: 48 },
-    { label: '7D', value: 168 },
-    { label: 'All', value: 720 },
+    { label: '24h', value: 24, description: 'Today' },
+    { label: '48h', value: 48, description: '2 Days' },
+    { label: '7D', value: 168, description: 'Weekly Review' },
+    { label: 'All', value: 720, description: 'Full History' },
   ];
+
+  const getTimelineSummary = () => {
+    const total = digest?.high_signal_announcements?.length || 0;
+    if (windowHours <= 24) {
+      return {
+        title: "Today's Intraday & Overnight Feed",
+        sub: `${total} high-conviction events surfaced from today's market close.`
+      };
+    } else if (windowHours <= 48) {
+      return {
+        title: "Trailing 48-Hour Digest",
+        sub: `${total} disclosures including yesterday's quarterly earnings & Board approvals.`
+      };
+    } else if (windowHours <= 168) {
+      return {
+        title: "Weekly Portfolio Review (7 Days)",
+        sub: `Comprehensive dossier of ${total} material corporate actions across the portfolio.`
+      };
+    }
+    return {
+      title: "Cumulative Corporate Timeline",
+      sub: `All ${total} verified disclosures across portfolio holdings.`
+    };
+  };
+
+  const timelineInfo = getTimelineSummary();
+
+  // Group announcements by Date Group (Today / Yesterday / Earlier this Week)
+  const groupedAnnouncements = (digest?.high_signal_announcements || []).reduce((acc, item) => {
+    const group = item.dateGroup || (item.timestamp?.includes('hour') ? 'Today' : item.timestamp?.includes('Yesterday') ? 'Yesterday' : 'Earlier this Week');
+    if (!acc[group]) acc[group] = [];
+    acc[group].push(item);
+    return acc;
+  }, {});
 
   return (
     <div className="space-y-4 pb-24">
@@ -63,7 +98,24 @@ export default function PushFeed({
         </button>
       </div>
 
-      {/* Triggered EOD Alerts (Volume > 2x / Price > ±3%) */}
+      {/* Timeline Status Callout */}
+      <div className="apple-card rounded-2xl px-4 py-3 flex items-center justify-between">
+        <div>
+          <div className="text-xs font-semibold text-white tracking-tight">
+            {timelineInfo.title}
+          </div>
+          <div className="text-[11px] text-[#86868b] mt-0.5">
+            {timelineInfo.sub}
+          </div>
+        </div>
+        <div className="text-right flex-shrink-0 pl-2">
+          <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-white/[0.08] text-[#f5f5f7]">
+            {digest?.high_signal_announcements?.length || 0} Events
+          </span>
+        </div>
+      </div>
+
+      {/* Triggered EOD Alerts */}
       {alerts && alerts.length > 0 && (
         <div className="space-y-2.5">
           <div className="flex items-center justify-between px-1">
@@ -131,188 +183,193 @@ export default function PushFeed({
         </div>
       )}
 
-      {/* Corporate Filings Feed */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between px-1 pt-1">
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">
-            Material Exchange Filings ({digest?.high_signal_announcements?.length || 0})
-          </span>
-          <span className="text-[11px] text-[#515156]">
-            Priority Filtered
-          </span>
-        </div>
-
-        {digest?.high_signal_announcements?.map((item) => {
-          const hasBreakdown = !!item.results_breakdown;
-          const hasBio = !!item.executive_bio;
-
-          return (
-            <div 
-              key={item.id}
-              className="apple-card rounded-2xl p-4 space-y-3 hover:border-white/15 transition-all"
-            >
-              {/* Header: Category Badge + Timestamp */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-[#86868b] bg-white/[0.06] px-2 py-0.5 rounded-md">
-                    {item.category.replace('_', ' ')}
-                  </span>
-                  <button 
-                    onClick={() => onSelectSymbol(item.symbol)}
-                    className="text-xs font-semibold text-white hover:text-[#2997ff] transition-colors"
-                  >
-                    {item.company_name}
-                  </button>
-                </div>
-                <span className="text-[11px] text-[#515156] font-medium">{item.timestamp}</span>
-              </div>
-
-              {/* Title & Core Summary */}
-              <div>
-                <h3 className="text-[14px] font-medium text-[#f5f5f7] leading-snug">
-                  {item.title}
-                </h3>
-                <p className="mt-1 text-[13px] text-[#a1a1a6] leading-relaxed">
-                  {item.summary_one_liner}
-                </p>
-              </div>
-
-              {/* ENRICHMENT 1: Financial Results Grid (Revenue, EBITDA, PBT, PAT) */}
-              {hasBreakdown && (
-                <div className="mt-3 p-3.5 rounded-xl bg-black/50 border border-white/[0.08] space-y-3">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-semibold text-white">
-                      Financial Results • {item.results_breakdown.period}
-                    </span>
-                    <span className="text-[11px] text-[#86868b]">
-                      Unit: {item.results_breakdown.unit}
-                    </span>
-                  </div>
-
-                  {/* 4 Quadrants: Revenue, EBITDA, PBT, PAT */}
-                  <div className="grid grid-cols-2 gap-2.5">
-                    {/* Revenue */}
-                    <div className="p-2.5 rounded-lg bg-[#141417] border border-white/[0.04]">
-                      <div className="text-[10px] uppercase text-[#86868b] font-medium">Revenue</div>
-                      <div className="text-[14px] font-semibold text-white tabular-numbers mt-0.5">
-                        ₹{item.results_breakdown.revenue.current.toLocaleString('en-IN')}
-                      </div>
-                      <div className="flex items-center gap-2 mt-1 text-[10px] tabular-numbers font-medium">
-                        <span className={item.results_breakdown.revenue.delta_qoq_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'}>
-                          QoQ: {item.results_breakdown.revenue.delta_qoq_pct >= 0 ? '+' : ''}{item.results_breakdown.revenue.delta_qoq_pct}%
-                        </span>
-                        <span className={item.results_breakdown.revenue.delta_yoy_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'}>
-                          YoY: {item.results_breakdown.revenue.delta_yoy_pct >= 0 ? '+' : ''}{item.results_breakdown.revenue.delta_yoy_pct}%
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* EBITDA */}
-                    <div className="p-2.5 rounded-lg bg-[#141417] border border-white/[0.04]">
-                      <div className="text-[10px] uppercase text-[#86868b] font-medium">
-                        EBITDA ({item.results_breakdown.ebitda_margin_pct}%)
-                      </div>
-                      <div className="text-[14px] font-semibold text-white tabular-numbers mt-0.5">
-                        ₹{item.results_breakdown.ebitda.current.toLocaleString('en-IN')}
-                      </div>
-                      <div className="flex items-center gap-2 mt-1 text-[10px] tabular-numbers font-medium">
-                        <span className={item.results_breakdown.ebitda.delta_qoq_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'}>
-                          QoQ: {item.results_breakdown.ebitda.delta_qoq_pct >= 0 ? '+' : ''}{item.results_breakdown.ebitda.delta_qoq_pct}%
-                        </span>
-                        <span className={item.results_breakdown.ebitda.delta_yoy_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'}>
-                          YoY: {item.results_breakdown.ebitda.delta_yoy_pct >= 0 ? '+' : ''}{item.results_breakdown.ebitda.delta_yoy_pct}%
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* PBT */}
-                    <div className="p-2.5 rounded-lg bg-[#141417] border border-white/[0.04]">
-                      <div className="text-[10px] uppercase text-[#86868b] font-medium">PBT</div>
-                      <div className="text-[14px] font-semibold text-white tabular-numbers mt-0.5">
-                        ₹{item.results_breakdown.pbt.current.toLocaleString('en-IN')}
-                      </div>
-                      <div className="flex items-center gap-2 mt-1 text-[10px] tabular-numbers font-medium">
-                        <span className={item.results_breakdown.pbt.delta_qoq_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'}>
-                          QoQ: {item.results_breakdown.pbt.delta_qoq_pct >= 0 ? '+' : ''}{item.results_breakdown.pbt.delta_qoq_pct}%
-                        </span>
-                        <span className={item.results_breakdown.pbt.delta_yoy_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'}>
-                          YoY: {item.results_breakdown.pbt.delta_yoy_pct >= 0 ? '+' : ''}{item.results_breakdown.pbt.delta_yoy_pct}%
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* PAT */}
-                    <div className="p-2.5 rounded-lg bg-[#141417] border border-white/[0.04]">
-                      <div className="text-[10px] uppercase text-[#86868b] font-medium">PAT (Net Profit)</div>
-                      <div className="text-[14px] font-semibold text-[#30d158] tabular-numbers mt-0.5">
-                        ₹{item.results_breakdown.pat.current.toLocaleString('en-IN')}
-                      </div>
-                      <div className="flex items-center gap-2 mt-1 text-[10px] tabular-numbers font-medium">
-                        <span className={item.results_breakdown.pat.delta_qoq_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'}>
-                          QoQ: {item.results_breakdown.pat.delta_qoq_pct >= 0 ? '+' : ''}{item.results_breakdown.pat.delta_qoq_pct}%
-                        </span>
-                        <span className={item.results_breakdown.pat.delta_yoy_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'}>
-                          YoY: {item.results_breakdown.pat.delta_yoy_pct >= 0 ? '+' : ''}{item.results_breakdown.pat.delta_yoy_pct}%
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <p className="text-[11px] text-[#86868b] leading-relaxed pt-2 border-t border-white/[0.06]">
-                    <span className="text-white font-medium">Analysis:</span> {item.results_breakdown.key_takeaway}
-                  </p>
-                </div>
-              )}
-
-              {/* ENRICHMENT 2: Executive Pedigree for Management Changes */}
-              {hasBio && (
-                <div className="mt-3 p-3.5 rounded-xl bg-black/50 border border-white/[0.08] space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-white">Executive Appointment</span>
-                    <span className="text-[10px] text-[#86868b] uppercase tracking-wide">
-                      {item.executive_bio.role}
-                    </span>
-                  </div>
-
-                  <div className="text-xs space-y-1 text-[#a1a1a6]">
-                    <div className="font-medium text-white">
-                      {item.executive_bio.name} • <span className="text-[#86868b]">Ex-{item.executive_bio.previous_firm}</span>
-                    </div>
-                    <p className="text-[12px] leading-relaxed text-[#86868b]">
-                      {item.executive_bio.career_summary}
-                    </p>
-                    <div className="p-2 rounded-lg bg-[#141417] text-[11px] text-[#d1d1d6] border border-white/[0.04]">
-                      <span className="text-white font-medium">Strategic Implications:</span> {item.executive_bio.strategic_implication}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Action Bar */}
-              <div className="flex items-center justify-between pt-2 border-t border-white/[0.06] text-xs">
-                <button
-                  onClick={() => onSelectSymbol(item.symbol)}
-                  className="text-white hover:text-[#2997ff] font-medium flex items-center gap-1 transition-colors"
-                >
-                  <span>Open Terminal</span>
-                  <ArrowUpRight className="w-3.5 h-3.5" />
-                </button>
-
-                {item.source_url && (
-                  <a
-                    href={item.source_url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-[#86868b] hover:text-white flex items-center gap-1 text-[11px] transition-colors"
-                  >
-                    <span>Filing PDF</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                )}
-              </div>
+      {/* Corporate Filings Feed (Chronologically Grouped) */}
+      <div className="space-y-4">
+        {Object.entries(groupedAnnouncements).map(([groupTitle, items]) => (
+          <div key={groupTitle} className="space-y-2.5">
+            
+            {/* Date Section Header (Apple Mail / News style) */}
+            <div className="flex items-center gap-2 px-1 pt-1">
+              <Calendar className="w-3 h-3 text-[#86868b]" />
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">
+                {groupTitle} ({items.length})
+              </span>
             </div>
-          );
-        })}
+
+            {items.map((item) => {
+              const hasBreakdown = !!item.results_breakdown;
+              const hasBio = !!item.executive_bio;
+
+              return (
+                <div 
+                  key={item.id}
+                  className="apple-card rounded-2xl p-4 space-y-3 hover:border-white/15 transition-all"
+                >
+                  {/* Header: Category Badge + Timestamp */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-[#86868b] bg-white/[0.06] px-2 py-0.5 rounded-md">
+                        {item.category.replace('_', ' ')}
+                      </span>
+                      <button 
+                        onClick={() => onSelectSymbol(item.symbol)}
+                        className="text-xs font-semibold text-white hover:text-[#2997ff] transition-colors"
+                      >
+                        {item.company_name}
+                      </button>
+                    </div>
+                    <span className="text-[11px] text-[#515156] font-medium">{item.timestamp}</span>
+                  </div>
+
+                  {/* Title & Core Summary */}
+                  <div>
+                    <h3 className="text-[14px] font-medium text-[#f5f5f7] leading-snug">
+                      {item.title}
+                    </h3>
+                    <p className="mt-1 text-[13px] text-[#a1a1a6] leading-relaxed">
+                      {item.summary_one_liner}
+                    </p>
+                  </div>
+
+                  {/* ENRICHMENT 1: Financial Results Grid */}
+                  {hasBreakdown && (
+                    <div className="mt-3 p-3.5 rounded-xl bg-black/50 border border-white/[0.08] space-y-3">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-semibold text-white">
+                          Financial Results • {item.results_breakdown.period}
+                        </span>
+                        <span className="text-[11px] text-[#86868b]">
+                          Unit: {item.results_breakdown.unit}
+                        </span>
+                      </div>
+
+                      {/* 4 Quadrants: Revenue, EBITDA, PBT, PAT */}
+                      <div className="grid grid-cols-2 gap-2.5">
+                        {/* Revenue */}
+                        <div className="p-2.5 rounded-lg bg-[#141417] border border-white/[0.04]">
+                          <div className="text-[10px] uppercase text-[#86868b] font-medium">Revenue</div>
+                          <div className="text-[14px] font-semibold text-white tabular-numbers mt-0.5">
+                            ₹{item.results_breakdown.revenue.current.toLocaleString('en-IN')}
+                          </div>
+                          <div className="flex items-center gap-2 mt-1 text-[10px] tabular-numbers font-medium">
+                            <span className={item.results_breakdown.revenue.delta_qoq_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'}>
+                              QoQ: {item.results_breakdown.revenue.delta_qoq_pct >= 0 ? '+' : ''}{item.results_breakdown.revenue.delta_qoq_pct}%
+                            </span>
+                            <span className={item.results_breakdown.revenue.delta_yoy_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'}>
+                              YoY: {item.results_breakdown.revenue.delta_yoy_pct >= 0 ? '+' : ''}{item.results_breakdown.revenue.delta_yoy_pct}%
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* EBITDA */}
+                        <div className="p-2.5 rounded-lg bg-[#141417] border border-white/[0.04]">
+                          <div className="text-[10px] uppercase text-[#86868b] font-medium">
+                            EBITDA ({item.results_breakdown.ebitda_margin_pct}%)
+                          </div>
+                          <div className="text-[14px] font-semibold text-white tabular-numbers mt-0.5">
+                            ₹{item.results_breakdown.ebitda.current.toLocaleString('en-IN')}
+                          </div>
+                          <div className="flex items-center gap-2 mt-1 text-[10px] tabular-numbers font-medium">
+                            <span className={item.results_breakdown.ebitda.delta_qoq_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'}>
+                              QoQ: {item.results_breakdown.ebitda.delta_qoq_pct >= 0 ? '+' : ''}{item.results_breakdown.ebitda.delta_qoq_pct}%
+                            </span>
+                            <span className={item.results_breakdown.ebitda.delta_yoy_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'}>
+                              YoY: {item.results_breakdown.ebitda.delta_yoy_pct >= 0 ? '+' : ''}{item.results_breakdown.ebitda.delta_yoy_pct}%
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* PBT */}
+                        <div className="p-2.5 rounded-lg bg-[#141417] border border-white/[0.04]">
+                          <div className="text-[10px] uppercase text-[#86868b] font-medium">PBT</div>
+                          <div className="text-[14px] font-semibold text-white tabular-numbers mt-0.5">
+                            ₹{item.results_breakdown.pbt.current.toLocaleString('en-IN')}
+                          </div>
+                          <div className="flex items-center gap-2 mt-1 text-[10px] tabular-numbers font-medium">
+                            <span className={item.results_breakdown.pbt.delta_qoq_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'}>
+                              QoQ: {item.results_breakdown.pbt.delta_qoq_pct >= 0 ? '+' : ''}{item.results_breakdown.pbt.delta_qoq_pct}%
+                            </span>
+                            <span className={item.results_breakdown.pbt.delta_yoy_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'}>
+                              YoY: {item.results_breakdown.pbt.delta_yoy_pct >= 0 ? '+' : ''}{item.results_breakdown.pbt.delta_yoy_pct}%
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* PAT */}
+                        <div className="p-2.5 rounded-lg bg-[#141417] border border-white/[0.04]">
+                          <div className="text-[10px] uppercase text-[#86868b] font-medium">PAT (Net Profit)</div>
+                          <div className="text-[14px] font-semibold text-[#30d158] tabular-numbers mt-0.5">
+                            ₹{item.results_breakdown.pat.current.toLocaleString('en-IN')}
+                          </div>
+                          <div className="flex items-center gap-2 mt-1 text-[10px] tabular-numbers font-medium">
+                            <span className={item.results_breakdown.pat.delta_qoq_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'}>
+                              QoQ: {item.results_breakdown.pat.delta_qoq_pct >= 0 ? '+' : ''}{item.results_breakdown.pat.delta_qoq_pct}%
+                            </span>
+                            <span className={item.results_breakdown.pat.delta_yoy_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'}>
+                              YoY: {item.results_breakdown.pat.delta_yoy_pct >= 0 ? '+' : ''}{item.results_breakdown.pat.delta_yoy_pct}%
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <p className="text-[11px] text-[#86868b] leading-relaxed pt-2 border-t border-white/[0.06]">
+                        <span className="text-white font-medium">Analysis:</span> {item.results_breakdown.key_takeaway}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* ENRICHMENT 2: Executive Pedigree */}
+                  {hasBio && (
+                    <div className="mt-3 p-3.5 rounded-xl bg-black/50 border border-white/[0.08] space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-semibold text-white">Executive Appointment</span>
+                        <span className="text-[10px] text-[#86868b] uppercase tracking-wide">
+                          {item.executive_bio.role}
+                        </span>
+                      </div>
+
+                      <div className="text-xs space-y-1 text-[#a1a1a6]">
+                        <div className="font-medium text-white">
+                          {item.executive_bio.name} • <span className="text-[#86868b]">Ex-{item.executive_bio.previous_firm}</span>
+                        </div>
+                        <p className="text-[12px] leading-relaxed text-[#86868b]">
+                          {item.executive_bio.career_summary}
+                        </p>
+                        <div className="p-2 rounded-lg bg-[#141417] text-[11px] text-[#d1d1d6] border border-white/[0.04]">
+                          <span className="text-white font-medium">Strategic Implications:</span> {item.executive_bio.strategic_implication}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Action Bar */}
+                  <div className="flex items-center justify-between pt-2 border-t border-white/[0.06] text-xs">
+                    <button
+                      onClick={() => onSelectSymbol(item.symbol)}
+                      className="text-white hover:text-[#2997ff] font-medium flex items-center gap-1 transition-colors"
+                    >
+                      <span>Open Terminal</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </button>
+
+                    {item.source_url && (
+                      <a
+                        href={item.source_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[#86868b] hover:text-white flex items-center gap-1 text-[11px] transition-colors"
+                      >
+                        <span>Filing PDF</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+
+          </div>
+        ))}
       </div>
 
       {/* Routine Paperwork Collapsed Section */}
