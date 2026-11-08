@@ -7,27 +7,23 @@ import {
   Coins, 
   Target, 
   Compass, 
-  FileText,
   ArrowRight,
   ShieldCheck
 } from 'lucide-react';
+import { TerminalSkeleton } from './Skeletons';
 
 export default function PullTerminal({ 
   analysis, 
   selectedSymbol, 
   onSelectSymbol, 
   portfolio = [],
-  onOpenAuditTab 
+  onOpenAuditTab,
+  isLoading = false 
 }) {
   const [activeModule, setActiveModule] = useState('business');
 
-  if (!analysis) {
-    return (
-      <div className="flex flex-col items-center justify-center p-16 text-center text-[#86868b]">
-        <div className="w-6 h-6 border-2 border-white/40 border-t-white rounded-full animate-spin mb-3"></div>
-        <p className="text-xs">Grounding primary reports & concall transcripts...</p>
-      </div>
-    );
+  if (isLoading || !analysis) {
+    return <TerminalSkeleton />;
   }
 
   const modules = [
@@ -43,7 +39,7 @@ export default function PullTerminal({
   const isPositive = analysis.day_change_pct >= 0;
 
   return (
-    <div className="space-y-4 pb-24">
+    <div className="space-y-4 pb-24 smooth-fade-in">
       
       {/* Horizontal Ticker Switcher */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
@@ -53,7 +49,7 @@ export default function PullTerminal({
             <button
               key={stock.symbol}
               onClick={() => onSelectSymbol(stock.symbol)}
-              className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs transition-all ${
+              className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs transition-all active:scale-95 ${
                 isSelected
                   ? 'bg-white text-black font-semibold shadow-sm'
                   : 'bg-[#1c1c1e] text-[#86868b] hover:text-white'
@@ -104,7 +100,7 @@ export default function PullTerminal({
       {/* Narrative vs Numbers Audit Featured Callout */}
       <div 
         onClick={onOpenAuditTab}
-        className="cursor-pointer apple-card rounded-2xl p-4 hover:border-white/20 transition-all flex items-center justify-between group"
+        className="cursor-pointer apple-card rounded-2xl p-4 hover:border-white/20 transition-all flex items-center justify-between group active:scale-[0.99]"
       >
         <div className="space-y-1">
           <div className="flex items-center gap-2">
@@ -132,7 +128,7 @@ export default function PullTerminal({
             <button
               key={m.id}
               onClick={() => setActiveModule(m.id)}
-              className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs transition-all ${
+              className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs transition-all active:scale-95 ${
                 isActive
                   ? 'bg-white text-black font-semibold shadow-sm'
                   : 'bg-[#1c1c1e] text-[#86868b] hover:text-white'
@@ -150,7 +146,7 @@ export default function PullTerminal({
         
         {/* 1. BUSINESS SNAPSHOT */}
         {activeModule === 'business' && (
-          <div className="space-y-4">
+          <div className="space-y-4 smooth-fade-in">
             <div>
               <h3 className="text-xs font-semibold uppercase tracking-wider text-[#86868b] mb-1.5">
                 Business Overview
@@ -206,7 +202,7 @@ export default function PullTerminal({
 
         {/* 2. FINANCIAL SNAPSHOT */}
         {activeModule === 'financials' && (
-          <div className="space-y-4">
+          <div className="space-y-4 smooth-fade-in">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-semibold uppercase tracking-wider text-[#86868b]">
                 Headline Figures ({analysis.financial_snapshot.period})
@@ -276,7 +272,7 @@ export default function PullTerminal({
 
         {/* 3. TRAJECTORY */}
         {activeModule === 'trajectory' && (
-          <div className="space-y-4">
+          <div className="space-y-4 smooth-fade-in">
             <div>
               <h3 className="text-xs font-semibold uppercase tracking-wider text-[#86868b] mb-2">
                 Multi-Year Trajectory
@@ -331,7 +327,7 @@ export default function PullTerminal({
 
         {/* 4. BALANCE SHEET & LEVERAGE */}
         {activeModule === 'balance_sheet' && (
-          <div className="space-y-4">
+          <div className="space-y-4 smooth-fade-in">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-[#86868b]">
               Capital Structure & Liquidity
             </h3>
@@ -379,7 +375,7 @@ export default function PullTerminal({
 
         {/* 5. CASH QUALITY & CONVERSION */}
         {activeModule === 'cash_quality' && (
-          <div className="space-y-4">
+          <div className="space-y-4 smooth-fade-in">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-semibold uppercase tracking-wider text-[#86868b]">
                 Cash Flow vs Accounting Profit
@@ -430,7 +426,7 @@ export default function PullTerminal({
 
         {/* 6. GUIDANCE TRACKER */}
         {activeModule === 'guidance' && (
-          <div className="space-y-4">
+          <div className="space-y-4 smooth-fade-in">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-semibold uppercase tracking-wider text-[#86868b]">
                 Forward Guidance ({analysis.guidance.fy_target})
@@ -478,7 +474,7 @@ export default function PullTerminal({
 
         {/* 7. BULL VS BEAR CASE */}
         {activeModule === 'bull_bear' && (
-          <div className="space-y-4">
+          <div className="space-y-4 smooth-fade-in">
             <h3 className="text-xs font-semibold uppercase tracking-wider text-[#86868b]">
               Primary Grounded Thesis
             </h3>

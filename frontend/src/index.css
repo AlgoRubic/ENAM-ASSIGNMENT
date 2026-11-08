@@ -56,13 +56,45 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.apple-segment-container {
-  background: rgba(118, 118, 128, 0.18);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+/* Apple Pro Skeleton Shimmer Animation */
+@keyframes appleShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
-.apple-segment-active {
-  background: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 1px rgba(255, 255, 255, 0.2);
+.apple-skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 25%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.03) 75%
+  );
+  background-size: 200% 100%;
+  animation: appleShimmer 1.8s ease-in-out infinite;
+}
+
+.apple-skeleton-card {
+  background: rgba(18, 18, 22, 0.55);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Smooth Fade In */
+@keyframes fadeInContent {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.smooth-fade-in {
+  animation: fadeInContent 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

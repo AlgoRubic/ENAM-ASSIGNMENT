@@ -12,6 +12,7 @@ import {
   Zap,
   Activity
 } from 'lucide-react';
+import { FeedSkeleton } from './Skeletons';
 
 export default function PushFeed({ 
   digest, 
@@ -21,11 +22,16 @@ export default function PushFeed({
   highSignalOnly, 
   setHighSignalOnly,
   onSelectSymbol,
-  onOpenSettings
+  onOpenSettings,
+  isLoading = false
 }) {
   const [showRoutine, setShowRoutine] = useState(false);
   const [alertFilter, setAlertFilter] = useState('all'); // 'all' | 'market' | 'filings'
   const [showAllAlerts, setShowAllAlerts] = useState(false);
+
+  if (isLoading || !digest) {
+    return <FeedSkeleton />;
+  }
 
   const windows = [
     { label: '24h', value: 24, description: 'Today' },
@@ -83,7 +89,7 @@ export default function PushFeed({
   }, {});
 
   return (
-    <div className="space-y-4 pb-24">
+    <div className="space-y-4 pb-24 smooth-fade-in">
       
       {/* iOS-Style Segmented Control Toolbar */}
       <div className="flex items-center justify-between gap-3">

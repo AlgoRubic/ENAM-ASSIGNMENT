@@ -7,14 +7,17 @@ import {
   FileSpreadsheet, 
   ShieldCheck 
 } from 'lucide-react';
+import { AuditSkeleton } from './Skeletons';
 
-export default function NarrativeAuditView({ analysis, selectedSymbol, onSelectSymbol, portfolio = [] }) {
-  if (!analysis || !analysis.narrative_audit) {
-    return (
-      <div className="p-16 text-center text-[#86868b]">
-        <p className="text-xs">Loading Narrative vs Numbers Audit...</p>
-      </div>
-    );
+export default function NarrativeAuditView({ 
+  analysis, 
+  selectedSymbol, 
+  onSelectSymbol, 
+  portfolio = [],
+  isLoading = false 
+}) {
+  if (isLoading || !analysis || !analysis.narrative_audit) {
+    return <AuditSkeleton />;
   }
 
   const audit = analysis.narrative_audit;
@@ -43,7 +46,7 @@ export default function NarrativeAuditView({ analysis, selectedSymbol, onSelectS
   };
 
   return (
-    <div className="space-y-4 pb-24">
+    <div className="space-y-4 pb-24 smooth-fade-in">
       
       {/* Ticker Selector */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
@@ -53,7 +56,7 @@ export default function NarrativeAuditView({ analysis, selectedSymbol, onSelectS
             <button
               key={stock.symbol}
               onClick={() => onSelectSymbol(stock.symbol)}
-              className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs transition-all ${
+              className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs transition-all active:scale-95 ${
                 isSelected
                   ? 'bg-white text-black font-semibold shadow-sm'
                   : 'bg-[#1c1c1e] text-[#86868b] hover:text-white'
@@ -73,7 +76,7 @@ export default function NarrativeAuditView({ analysis, selectedSymbol, onSelectS
               Forensic Audit • 4 Quarters
             </span>
             <h1 className="text-[20px] font-semibold text-white tracking-tight leading-tight">
-              Narrative vs. Numbers
+              Narrative vs. Numbers: {analysis.company_name}
             </h1>
             <p className="text-xs text-[#a1a1a6] mt-1 leading-relaxed">
               {audit.summary}

@@ -27,6 +27,7 @@ export default function App() {
   const [highSignalOnly, setHighSignalOnly] = useState(false);
   const [volumeThreshold, setVolumeThreshold] = useState(2.0);
   const [priceThreshold, setPriceThreshold] = useState(3.0);
+  const [loadingDigest, setLoadingDigest] = useState(false);
 
   // Pull Terminal state
   const [analysis, setAnalysis] = useState(null);
@@ -49,11 +50,15 @@ export default function App() {
   // Re-fetch Digest and Alerts whenever windowHours, highSignalOnly, or thresholds change
   useEffect(() => {
     async function syncFeedAndAlerts() {
-      const dData = await fetchDigest(windowHours, highSignalOnly);
+      setLoadingDigest(true);
+      const [dData, aData] = await Promise.all([
+        fetchDigest(windowHours, highSignalOnly),
+        fetchAlerts(volumeThreshold, priceThreshold, windowHours)
+      ]);
       setDigest(dData);
-
-      const aData = await fetchAlerts(volumeThreshold, priceThreshold, windowHours);
       setAlerts(aData.alerts || []);
+      // Smooth Apple-style loading fade
+      setTimeout(() => setLoadingDigest(false), 240);
     }
     syncFeedAndAlerts();
   }, [windowHours, highSignalOnly, volumeThreshold, priceThreshold]);
@@ -64,19 +69,25 @@ export default function App() {
       setLoadingAnalysis(true);
       const aData = await fetchCompanyAnalysis(selectedSymbol);
       setAnalysis(aData);
-      setLoadingAnalysis(false);
+      // Smooth Apple-style loading fade
+      setTimeout(() => setLoadingAnalysis(false), 280);
     }
     loadAnalysis();
   }, [selectedSymbol]);
 
   // Re-scan alerts when threshold settings are updated
   const handleApplyThresholds = async (newVol, newPrice) => {
-    const aData = await fetchAlerts(newVol, newPrice);
+    setLoadingDigest(true);
+    const aData = await fetchAlerts(newVol, newPrice, windowHours);
     setAlerts(aData.alerts || []);
+    setTimeout(() => setLoadingDigest(false), 200);
   };
 
   const handleSelectSymbol = (symbol) => {
-    setSelectedSymbol(symbol);
+    if (symbol !== selectedSymbol) {
+      setLoadingAnalysis(true);
+      setSelectedSymbol(symbol);
+    }
     // When a symbol is clicked from Push, take user directly to Terminal
     if (activeTab === 'push') {
       setActiveTab('pull');
@@ -108,6 +119,7 @@ export default function App() {
             setHighSignalOnly={setHighSignalOnly}
             onSelectSymbol={handleSelectSymbol}
             onOpenSettings={() => setIsSettingsOpen(true)}
+            isLoading={loadingDigest}
           />
         )}
 
@@ -115,9 +127,10 @@ export default function App() {
           <PullTerminal
             analysis={analysis}
             selectedSymbol={selectedSymbol}
-            onSelectSymbol={setSelectedSymbol}
+            onSelectSymbol={handleSelectSymbol}
             portfolio={portfolio}
             onOpenAuditTab={() => setActiveTab('audit')}
+            isLoading={loadingAnalysis}
           />
         )}
 
@@ -125,8 +138,9 @@ export default function App() {
           <NarrativeAuditView
             analysis={analysis}
             selectedSymbol={selectedSymbol}
-            onSelectSymbol={setSelectedSymbol}
+            onSelectSymbol={handleSelectSymbol}
             portfolio={portfolio}
+            isLoading={loadingAnalysis}
           />
         )}
 
