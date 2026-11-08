@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, X, TrendingUp, Sparkles, Building2, ChevronRight } from 'lucide-react';
+import { Search, X, ChevronRight } from 'lucide-react';
 
 export default function CompanySearchModal({ 
   isOpen, 
@@ -35,53 +35,50 @@ export default function CompanySearchModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-200">
-      <div className="w-full max-w-md bg-[#0d131f] border border-gray-800 rounded-t-3xl sm:rounded-3xl p-5 space-y-4 max-h-[85vh] flex flex-col shadow-2xl">
+    <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xl flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div className="w-full max-w-md bg-[#161618] border border-white/[0.1] rounded-t-3xl sm:rounded-3xl p-5 space-y-4 max-h-[85vh] flex flex-col shadow-2xl">
         
         {/* Modal Top Bar */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Search className="w-4 h-4 text-emerald-400" />
-            <h2 className="text-sm font-bold text-white">Search NSE Stocks</h2>
-          </div>
+          <h2 className="text-sm font-semibold text-white">Search Stocks</h2>
           <button 
             onClick={onClose}
-            className="p-1 rounded-xl bg-gray-800 text-gray-400 hover:text-white"
+            className="w-7 h-7 rounded-full bg-white/[0.08] text-[#86868b] hover:text-white flex items-center justify-center"
           >
-            <X className="w-4 h-4" />
+            <X className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        {/* Input Bar */}
+        {/* Apple Spotlight Search Bar */}
         <form onSubmit={handleCustomSubmit} className="relative">
+          <Search className="w-4 h-4 text-[#86868b] absolute left-3.5 top-3" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Type any NSE ticker or name (e.g. INFY, HAL, BEL)..."
+            placeholder="Search company, ticker or sector (e.g. TCS, BEL)..."
             autoFocus
-            className="w-full bg-gray-900 border border-gray-700 rounded-2xl px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors"
+            className="w-full bg-[#242426] border border-transparent focus:border-white/20 rounded-xl pl-10 pr-12 py-2.5 text-xs text-white placeholder-[#86868b] focus:outline-none transition-colors"
           />
           {query.trim() && (
             <button
               type="submit"
-              className="absolute right-2 top-2 px-3 py-1.5 rounded-xl bg-emerald-500 text-black text-xs font-bold hover:bg-emerald-400"
+              className="absolute right-2 top-1.5 px-2.5 py-1 rounded-lg bg-white text-black text-[11px] font-semibold"
             >
-              Go
+              Open
             </button>
           )}
         </form>
 
-        {/* Search Results / Lists */}
+        {/* Results List */}
         <div className="flex-1 overflow-y-auto space-y-4 no-scrollbar pr-1">
           
-          {/* Ad-Hoc On-Demand Research Set (Outside Portfolio) */}
+          {/* Ad-Hoc Demo Tickers */}
           {filteredAdHoc.length > 0 && (
-            <div className="space-y-1.5">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-cyan-400 px-1 flex items-center gap-1">
-                <Sparkles className="w-3 h-3" />
-                <span>Ad-Hoc Demo Tickers (Outside Portfolio)</span>
-              </div>
+            <div className="space-y-1">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-[#86868b] px-1">
+                Ad-Hoc Demo Companies (Outside Portfolio)
+              </span>
               <div className="space-y-1">
                 {filteredAdHoc.map((stock) => (
                   <button
@@ -90,17 +87,17 @@ export default function CompanySearchModal({
                       onSelectSymbol(stock.symbol);
                       onClose();
                     }}
-                    className="w-full text-left p-3 rounded-2xl bg-cyan-950/20 hover:bg-cyan-900/30 border border-cyan-500/20 flex items-center justify-between group transition-colors"
+                    className="w-full text-left p-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] flex items-center justify-between transition-colors group"
                   >
                     <div>
-                      <div className="text-xs font-bold text-white group-hover:text-cyan-300">
+                      <div className="text-xs font-semibold text-white">
                         {stock.name}
                       </div>
-                      <div className="text-[11px] text-gray-400">
+                      <div className="text-[11px] text-[#86868b]">
                         {stock.symbol} • {stock.sector}
                       </div>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-cyan-400 group-hover:translate-x-0.5 transition-transform" />
+                    <ChevronRight className="w-4 h-4 text-[#515156] group-hover:text-white transition-colors" />
                   </button>
                 ))}
               </div>
@@ -108,11 +105,10 @@ export default function CompanySearchModal({
           )}
 
           {/* Portfolio Companies */}
-          <div className="space-y-1.5">
-            <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 px-1 flex items-center gap-1">
-              <Building2 className="w-3 h-3" />
-              <span>Core Portfolio ({filteredPortfolio.length})</span>
-            </div>
+          <div className="space-y-1">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-[#86868b] px-1">
+              Portfolio Holdings ({filteredPortfolio.length})
+            </span>
             <div className="space-y-1">
               {filteredPortfolio.map((stock) => (
                 <button
@@ -121,21 +117,23 @@ export default function CompanySearchModal({
                     onSelectSymbol(stock.symbol);
                     onClose();
                   }}
-                  className="w-full text-left p-3 rounded-2xl bg-gray-900/60 hover:bg-gray-800 border border-gray-800 flex items-center justify-between group transition-colors"
+                  className="w-full text-left p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.08] flex items-center justify-between transition-colors group"
                 >
                   <div>
-                    <div className="text-xs font-bold text-white group-hover:text-emerald-300">
+                    <div className="text-xs font-semibold text-white">
                       {stock.name}
                     </div>
-                    <div className="text-[11px] text-gray-400">
+                    <div className="text-[11px] text-[#86868b]">
                       {stock.symbol} • {stock.sector}
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-xs font-bold text-white">
+                    <div className="text-xs font-semibold text-white tabular-numbers">
                       ₹{stock.price?.toLocaleString('en-IN')}
                     </div>
-                    <div className={`text-[10px] font-bold ${stock.change_pct >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    <div className={`text-[10px] font-semibold tabular-numbers ${
+                      stock.change_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'
+                    }`}>
                       {stock.change_pct >= 0 ? '+' : ''}{stock.change_pct}%
                     </div>
                   </div>

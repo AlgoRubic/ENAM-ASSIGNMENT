@@ -1,20 +1,18 @@
 import React from 'react';
 import { 
-  Scale, 
   CheckCircle2, 
   AlertTriangle, 
   Clock, 
   Quote, 
   FileSpreadsheet, 
-  ShieldCheck, 
-  ArrowUpRight 
+  ShieldCheck 
 } from 'lucide-react';
 
 export default function NarrativeAuditView({ analysis, selectedSymbol, onSelectSymbol, portfolio = [] }) {
   if (!analysis || !analysis.narrative_audit) {
     return (
-      <div className="p-8 text-center text-gray-400">
-        <p>Loading Narrative vs Numbers Audit...</p>
+      <div className="p-16 text-center text-[#86868b]">
+        <p className="text-xs">Loading Narrative vs Numbers Audit...</p>
       </div>
     );
   }
@@ -24,22 +22,22 @@ export default function NarrativeAuditView({ analysis, selectedSymbol, onSelectS
   const getVerdictStyle = (verdict) => {
     if (verdict.includes('Delivered') || verdict.includes('Exceeded')) {
       return {
-        bg: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300',
+        pill: 'text-[#30d158] bg-[#30d158]/10 border border-[#30d158]/20',
         icon: CheckCircle2,
       };
     } else if (verdict.includes('Missed') || verdict.includes('Squeeze')) {
       return {
-        bg: 'bg-rose-500/15 border-rose-500/30 text-rose-300',
+        pill: 'text-[#ff453a] bg-[#ff453a]/10 border border-[#ff453a]/20',
         icon: AlertTriangle,
       };
     } else if (verdict.includes('Postponed') || verdict.includes('Deferred')) {
       return {
-        bg: 'bg-amber-500/15 border-amber-500/30 text-amber-300',
+        pill: 'text-[#ff9f0a] bg-[#ff9f0a]/10 border border-[#ff9f0a]/20',
         icon: Clock,
       };
     }
     return {
-      bg: 'bg-cyan-500/15 border-cyan-500/30 text-cyan-300',
+      pill: 'text-white/80 bg-white/[0.08] border border-white/[0.12]',
       icon: Clock,
     };
   };
@@ -49,60 +47,63 @@ export default function NarrativeAuditView({ analysis, selectedSymbol, onSelectS
       
       {/* Ticker Selector */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-        {portfolio.map((stock) => (
-          <button
-            key={stock.symbol}
-            onClick={() => onSelectSymbol(stock.symbol)}
-            className={`flex-shrink-0 px-2.5 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-              selectedSymbol === stock.symbol
-                ? 'bg-cyan-500 text-black shadow-md font-bold'
-                : 'bg-gray-800/80 text-gray-400 hover:text-white border border-gray-700/60'
-            }`}
-          >
-            {stock.symbol.replace('.NS', '')}
-          </button>
-        ))}
+        {portfolio.map((stock) => {
+          const isSelected = selectedSymbol === stock.symbol;
+          return (
+            <button
+              key={stock.symbol}
+              onClick={() => onSelectSymbol(stock.symbol)}
+              className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs transition-all ${
+                isSelected
+                  ? 'bg-white text-black font-semibold shadow-sm'
+                  : 'bg-[#1c1c1e] text-[#86868b] hover:text-white'
+              }`}
+            >
+              {stock.symbol.replace('.NS', '')}
+            </button>
+          );
+        })}
       </div>
 
       {/* Audit Banner with Credibility Score */}
-      <div className="glass-panel rounded-2xl p-4 border border-cyan-500/30 space-y-3">
+      <div className="apple-card rounded-2xl p-5 space-y-4">
         <div className="flex items-start justify-between">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
-                Core ENAM Signal
-              </span>
-              <span className="text-xs text-gray-400">4-Quarter Analysis</span>
-            </div>
-            <h1 className="text-base font-bold text-white mt-1">
-              Narrative vs. Numbers: {analysis.company_name}
+          <div className="space-y-1">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">
+              Forensic Audit • 4 Quarters
+            </span>
+            <h1 className="text-[20px] font-semibold text-white tracking-tight leading-tight">
+              Narrative vs. Numbers
             </h1>
-            <p className="text-xs text-gray-300 mt-1 leading-relaxed">
+            <p className="text-xs text-[#a1a1a6] mt-1 leading-relaxed">
               {audit.summary}
             </p>
           </div>
 
-          {/* Credibility Gauge */}
-          <div className="text-center p-3 rounded-2xl bg-black/50 border border-cyan-500/30 flex-shrink-0">
-            <div className="text-[10px] font-bold uppercase text-gray-400">Credibility</div>
-            <div className="text-2xl font-black text-cyan-400 mt-0.5">
+          {/* Apple Health style Credibility Metric */}
+          <div className="text-center p-3.5 rounded-2xl bg-black/40 border border-white/[0.08] flex-shrink-0">
+            <div className="text-[10px] uppercase font-semibold text-[#86868b]">Credibility</div>
+            <div className="text-[24px] font-bold text-white tabular-numbers mt-0.5">
               {audit.credibility_score}
-              <span className="text-xs text-gray-500 font-normal">/100</span>
+              <span className="text-xs text-[#515156] font-normal">/100</span>
             </div>
-            <div className="text-[9px] font-semibold text-emerald-400">High Trust</div>
+            <div className="text-[10px] font-medium text-[#30d158] mt-0.5">Verified</div>
           </div>
         </div>
 
-        {/* Key Divergences Highlight */}
+        {/* Identified Divergences */}
         {audit.key_divergences_identified?.length > 0 && (
-          <div className="p-3 rounded-xl bg-gray-900/90 border border-gray-800 text-xs space-y-1.5">
-            <span className="font-bold text-amber-400 flex items-center gap-1.5">
-              <AlertTriangle className="w-3.5 h-3.5" />
-              Identified Guidance Divergences & Adjustments:
+          <div className="p-3.5 rounded-xl bg-black/40 border border-white/[0.06] text-xs space-y-2">
+            <span className="font-semibold text-white flex items-center gap-1.5">
+              <AlertTriangle className="w-3.5 h-3.5 text-[#ff9f0a]" />
+              Identified Narrative Divergences
             </span>
-            <ul className="list-disc list-inside text-gray-300 space-y-1 text-[11px] leading-relaxed">
+            <ul className="text-[#a1a1a6] space-y-1.5 text-[12px] leading-relaxed">
               {audit.key_divergences_identified.map((div, idx) => (
-                <li key={idx}>{div}</li>
+                <li key={idx} className="flex items-start gap-2">
+                  <span className="text-[#ff9f0a] font-bold">•</span>
+                  <span>{div}</span>
+                </li>
               ))}
             </ul>
           </div>
@@ -112,11 +113,10 @@ export default function NarrativeAuditView({ analysis, selectedSymbol, onSelectS
       {/* 4 Quarters Audited Timeline */}
       <div className="space-y-3">
         <div className="flex items-center justify-between px-1">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-gray-300 flex items-center gap-1.5">
-            <Scale className="w-3.5 h-3.5 text-cyan-400" />
-            Quarterly Promise vs. Delivery Breakdown
-          </h2>
-          <span className="text-[11px] text-gray-500">Concalls vs. Filings</span>
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">
+            Quarterly Breakdown (Concalls vs. Filings)
+          </span>
+          <span className="text-[11px] text-[#515156]">Primary Evidence</span>
         </div>
 
         {audit.quarters_audited.map((item, index) => {
@@ -126,51 +126,51 @@ export default function NarrativeAuditView({ analysis, selectedSymbol, onSelectS
           return (
             <div 
               key={index} 
-              className="glass-panel rounded-2xl p-4 border border-gray-800 space-y-3 relative overflow-hidden"
+              className="apple-card rounded-2xl p-4 space-y-3.5"
             >
-              {/* Top Row: Quarter + Verdict Badge */}
+              {/* Header: Quarter + Verdict Badge */}
               <div className="flex items-center justify-between">
-                <span className="text-xs font-black font-mono text-white px-2 py-0.5 rounded bg-gray-800 border border-gray-700">
+                <span className="text-xs font-semibold font-mono text-white px-2 py-0.5 rounded bg-white/[0.08]">
                   {item.quarter}
                 </span>
 
-                <span className={`inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${vStyle.bg}`}>
+                <span className={`inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-0.5 rounded-full ${vStyle.pill}`}>
                   <Icon className="w-3 h-3" />
                   {item.verdict}
                 </span>
               </div>
 
-              {/* What Management Promised (Concall) */}
-              <div className="p-3 rounded-xl bg-black/40 border border-gray-800/90 space-y-1.5">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1">
+              {/* Concall Narrative */}
+              <div className="p-3 rounded-xl bg-black/40 border border-white/[0.04] space-y-1">
+                <div className="text-[10px] uppercase font-semibold text-[#86868b] flex items-center gap-1">
                   <Quote className="w-3 h-3" />
-                  The Concall Narrative (Guidance Promised)
+                  Concall Guidance (Narrative)
                 </div>
-                <div className="text-xs font-semibold text-white">
+                <div className="text-[13px] font-medium text-white">
                   "{item.management_guidance_claim}"
                 </div>
-                <p className="text-[11px] text-gray-400 italic">
-                  Exact Citation: "{item.source_concall_quote}"
+                <p className="text-[11px] text-[#86868b] italic">
+                  Citation: "{item.source_concall_quote}"
                 </p>
               </div>
 
-              {/* What Was Actually Reported in Exchange Results */}
-              <div className="p-3 rounded-xl bg-gray-900/60 border border-gray-800/90 space-y-1.5">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1">
+              {/* Reported Numbers */}
+              <div className="p-3 rounded-xl bg-black/40 border border-white/[0.04] space-y-1">
+                <div className="text-[10px] uppercase font-semibold text-[#86868b] flex items-center gap-1">
                   <FileSpreadsheet className="w-3 h-3" />
-                  The Regulatory Numbers (Delivery In Filing)
+                  Reported In Regulatory Filing (Numbers)
                 </div>
-                <div className="text-xs font-semibold text-white">
+                <div className="text-[13px] font-medium text-white">
                   {item.actual_reported_delivery}
                 </div>
-                <div className="text-[10px] text-gray-400 font-mono">
-                  Audited Primary Source: {item.actual_filing_source}
+                <div className="text-[10px] text-[#515156] font-mono">
+                  Source: {item.actual_filing_source}
                 </div>
               </div>
 
-              {/* Divergence & Institutional Analysis */}
-              <div className="pt-2 border-t border-gray-800/80 text-xs text-gray-300">
-                <span className="font-semibold text-white">Analysis: </span>
+              {/* Analysis */}
+              <div className="pt-2 border-t border-white/[0.06] text-xs text-[#a1a1a6] leading-relaxed">
+                <span className="font-semibold text-white">Institutional Analysis: </span>
                 <span>{item.divergence_analysis}</span>
               </div>
             </div>

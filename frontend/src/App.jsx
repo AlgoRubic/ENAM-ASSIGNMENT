@@ -84,7 +84,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#080c14] text-gray-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-black">
+    <div className="min-h-screen bg-black text-[#f5f5f7] flex flex-col font-sans selection:bg-white selection:text-black">
       
       {/* Mobile Top Header */}
       <Header

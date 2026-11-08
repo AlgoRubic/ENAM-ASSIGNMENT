@@ -1,19 +1,12 @@
 import React, { useState } from 'react';
 import { 
-  AlertTriangle, 
-  TrendingUp, 
-  TrendingDown, 
-  Filter, 
-  ExternalLink, 
+  ArrowUpRight, 
+  ArrowDownRight, 
   ChevronDown, 
   ChevronUp, 
-  UserCheck, 
-  FileText, 
-  Clock, 
-  Sliders,
-  Sparkles,
-  ArrowUpRight,
-  ArrowDownRight
+  ExternalLink, 
+  SlidersHorizontal,
+  FileText
 } from 'lucide-react';
 
 export default function PushFeed({ 
@@ -27,77 +20,62 @@ export default function PushFeed({
   onOpenSettings
 }) {
   const [showRoutine, setShowRoutine] = useState(false);
-  const [expandedCard, setExpandedCard] = useState(null);
-
-  const toggleExpand = (id) => {
-    setExpandedCard(expandedCard === id ? null : id);
-  };
 
   const windows = [
     { label: '24h', value: 24 },
     { label: '48h', value: 48 },
-    { label: '7 Days', value: 168 },
+    { label: '7D', value: 168 },
     { label: 'All', value: 720 },
   ];
 
   return (
-    <div className="space-y-4 pb-20">
+    <div className="space-y-4 pb-24">
       
-      {/* Time Window & Priority Filter Toolbar */}
-      <div className="glass-panel rounded-2xl p-3 border border-gray-800/80">
-        <div className="flex items-center justify-between gap-2 mb-2.5">
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-300">
-            <Clock className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Digest Window:</span>
-          </div>
-
-          <button
-            onClick={() => setHighSignalOnly(!highSignalOnly)}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium transition-colors ${
-              highSignalOnly 
-                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' 
-                : 'bg-gray-800/80 text-gray-400 border border-gray-700/60'
-            }`}
-          >
-            <Filter className="w-3 h-3" />
-            <span>High Signal Only</span>
-          </button>
-        </div>
-
-        {/* Window Selector Pills */}
-        <div className="grid grid-cols-4 gap-1.5 p-1 bg-black/40 rounded-xl">
+      {/* iOS-Style Segmented Control Toolbar */}
+      <div className="flex items-center justify-between gap-3">
+        {/* Window Selector */}
+        <div className="flex-1 bg-[#1c1c1e] p-1 rounded-xl flex items-center">
           {windows.map((w) => (
             <button
               key={w.value}
               onClick={() => setWindowHours(w.value)}
-              className={`py-1.5 text-xs font-semibold rounded-lg transition-all ${
+              className={`flex-1 py-1 text-xs transition-all rounded-lg ${
                 windowHours === w.value
-                  ? 'bg-emerald-500 text-black shadow-sm font-bold'
-                  : 'text-gray-400 hover:text-gray-200'
+                  ? 'bg-[#2c2c2e] text-white font-semibold shadow-sm'
+                  : 'text-[#86868b] hover:text-[#d1d1d6] font-medium'
               }`}
             >
               {w.label}
             </button>
           ))}
         </div>
+
+        {/* High Signal Toggle */}
+        <button
+          onClick={() => setHighSignalOnly(!highSignalOnly)}
+          className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all border ${
+            highSignalOnly 
+              ? 'bg-white text-black border-white font-semibold' 
+              : 'bg-[#1c1c1e] text-[#86868b] border-transparent hover:text-white'
+          }`}
+        >
+          Signal Only
+        </button>
       </div>
 
-      {/* Triggered Unusual Move Alerts (EOD Volume > 2x / Price > ±3%) */}
+      {/* Triggered EOD Alerts (Volume > 2x / Price > ±3%) */}
       {alerts && alerts.length > 0 && (
-        <div className="space-y-2">
+        <div className="space-y-2.5">
           <div className="flex items-center justify-between px-1">
-            <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
-              <h2 className="text-xs font-bold uppercase tracking-wider text-amber-400">
-                Triggered EOD Alerts ({alerts.length})
-              </h2>
-            </div>
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">
+              Triggered Alerts ({alerts.length})
+            </span>
             <button
               onClick={onOpenSettings}
-              className="text-[11px] text-gray-400 hover:text-gray-200 flex items-center gap-1 underline underline-offset-2"
+              className="text-[11px] text-[#86868b] hover:text-white transition-colors flex items-center gap-1"
             >
-              <Sliders className="w-3 h-3" />
-              Adjust Thresholds
+              <SlidersHorizontal className="w-3 h-3" />
+              <span>Thresholds</span>
             </button>
           </div>
 
@@ -108,36 +86,42 @@ export default function PushFeed({
                 <div 
                   key={alert.id}
                   onClick={() => onSelectSymbol(alert.symbol)}
-                  className="cursor-pointer glass-panel rounded-2xl p-3.5 border-l-4 border-l-amber-500 border-gray-800/80 hover:border-amber-500/50 transition-all group"
+                  className="cursor-pointer apple-card rounded-2xl p-4 hover:border-white/20 transition-all active:scale-[0.99]"
                 >
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-white group-hover:text-amber-300 transition-colors">
+                        <span className="text-[15px] font-semibold text-white tracking-tight">
                           {alert.company_name}
                         </span>
-                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-gray-800 text-gray-300 border border-gray-700/60">
-                          {alert.symbol}
+                        <span className="text-[11px] font-mono text-[#86868b]">
+                          {alert.symbol.replace('.NS', '')}
                         </span>
                       </div>
                       <div className="mt-1 flex items-center gap-2 text-xs">
-                        <span className="font-bold text-white">₹{alert.current_price?.toLocaleString('en-IN')}</span>
-                        <span className={`inline-flex items-center text-xs font-bold ${isPositive ? 'text-emerald-400' : 'text-rose-400'}`}>
+                        <span className="font-semibold text-white tabular-numbers">
+                          ₹{alert.current_price?.toLocaleString('en-IN')}
+                        </span>
+                        <span className={`inline-flex items-center font-semibold tabular-numbers ${
+                          isPositive ? 'text-[#30d158]' : 'text-[#ff453a]'
+                        }`}>
                           {isPositive ? '+' : ''}{alert.price_change_pct}%
                         </span>
-                        <span className="text-gray-500">•</span>
-                        <span className="text-amber-400 font-semibold bg-amber-400/10 px-1.5 py-0.5 rounded border border-amber-400/20">
-                          {alert.volume_multiplier}x 20D Vol
+                        <span className="text-[#3a3a3c]">•</span>
+                        <span className="text-[11px] font-medium text-[#ff9f0a] bg-[#ff9f0a]/10 px-2 py-0.5 rounded-full">
+                          {alert.volume_multiplier}x Vol
                         </span>
                       </div>
                     </div>
 
-                    <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                      {isPositive ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
+                    <div className={`p-1.5 rounded-full ${
+                      isPositive ? 'bg-[#30d158]/10 text-[#30d158]' : 'bg-[#ff453a]/10 text-[#ff453a]'
+                    }`}>
+                      {isPositive ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
                     </div>
                   </div>
 
-                  <p className="mt-2 text-xs text-gray-300 leading-relaxed">
+                  <p className="mt-2.5 text-[12px] text-[#a1a1a6] leading-relaxed">
                     {alert.reasoning}
                   </p>
                 </div>
@@ -147,187 +131,171 @@ export default function PushFeed({
         </div>
       )}
 
-      {/* Corporate Announcements Feed (Surfacing High-Signal Filings First) */}
+      {/* Corporate Filings Feed */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between px-1">
-          <div className="flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-            <h2 className="text-xs font-bold uppercase tracking-wider text-gray-300">
-              Material Filings & Signals ({digest?.high_signal_announcements?.length || 0})
-            </h2>
-          </div>
-          <span className="text-[11px] text-gray-500 font-medium">
-            Prioritized by Conviction
+        <div className="flex items-center justify-between px-1 pt-1">
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">
+            Material Exchange Filings ({digest?.high_signal_announcements?.length || 0})
+          </span>
+          <span className="text-[11px] text-[#515156]">
+            Priority Filtered
           </span>
         </div>
 
         {digest?.high_signal_announcements?.map((item) => {
-          const isExpanded = expandedCard === item.id;
           const hasBreakdown = !!item.results_breakdown;
           const hasBio = !!item.executive_bio;
 
           return (
             <div 
               key={item.id}
-              className="glass-panel rounded-2xl p-4 border border-gray-800/80 hover:border-gray-700/80 transition-all space-y-3"
+              className="apple-card rounded-2xl p-4 space-y-3 hover:border-white/15 transition-all"
             >
-              {/* Card Header: Category Chip + Ticker + Timestamp */}
+              {/* Header: Category Badge + Timestamp */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${
-                    item.category === 'results' 
-                      ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
-                      : item.category === 'management_change'
-                      ? 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30'
-                      : item.category === 'M&A'
-                      ? 'bg-purple-500/15 text-purple-300 border-purple-500/30'
-                      : item.category === 'litigation'
-                      ? 'bg-rose-500/15 text-rose-300 border-rose-500/30'
-                      : 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30'
-                  }`}>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-[#86868b] bg-white/[0.06] px-2 py-0.5 rounded-md">
                     {item.category.replace('_', ' ')}
                   </span>
                   <button 
                     onClick={() => onSelectSymbol(item.symbol)}
-                    className="text-xs font-bold text-white hover:text-emerald-400 transition-colors"
+                    className="text-xs font-semibold text-white hover:text-[#2997ff] transition-colors"
                   >
                     {item.company_name}
                   </button>
                 </div>
-                <span className="text-[11px] text-gray-500">{item.timestamp}</span>
+                <span className="text-[11px] text-[#515156] font-medium">{item.timestamp}</span>
               </div>
 
-              {/* Title & Core One-Liner */}
+              {/* Title & Core Summary */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-100 leading-snug">
+                <h3 className="text-[14px] font-medium text-[#f5f5f7] leading-snug">
                   {item.title}
                 </h3>
-                <p className="mt-1 text-xs text-gray-300 leading-relaxed font-medium">
+                <p className="mt-1 text-[13px] text-[#a1a1a6] leading-relaxed">
                   {item.summary_one_liner}
                 </p>
               </div>
 
-              {/* SPECIAL ENRICHMENT 1: Quarterly Results QoQ & YoY Delta Grid */}
+              {/* ENRICHMENT 1: Financial Results Grid (Revenue, EBITDA, PBT, PAT) */}
               {hasBreakdown && (
-                <div className="mt-3 p-3 rounded-xl bg-gray-900/90 border border-emerald-500/30 space-y-2.5">
+                <div className="mt-3 p-3.5 rounded-xl bg-black/50 border border-white/[0.08] space-y-3">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold text-emerald-400 flex items-center gap-1">
-                      <Sparkles className="w-3 h-3" />
-                      Results First-Cut ({item.results_breakdown.period})
+                    <span className="font-semibold text-white">
+                      Financial Results • {item.results_breakdown.period}
                     </span>
-                    <span className="text-[11px] text-gray-400 font-mono">
+                    <span className="text-[11px] text-[#86868b]">
                       Unit: {item.results_breakdown.unit}
                     </span>
                   </div>
 
                   {/* 4 Quadrants: Revenue, EBITDA, PBT, PAT */}
-                  <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="grid grid-cols-2 gap-2.5">
                     {/* Revenue */}
-                    <div className="p-2 rounded-lg bg-black/40 border border-gray-800">
-                      <div className="text-[10px] text-gray-400 font-medium">Revenue</div>
-                      <div className="text-sm font-bold text-white">
+                    <div className="p-2.5 rounded-lg bg-[#141417] border border-white/[0.04]">
+                      <div className="text-[10px] uppercase text-[#86868b] font-medium">Revenue</div>
+                      <div className="text-[14px] font-semibold text-white tabular-numbers mt-0.5">
                         ₹{item.results_breakdown.revenue.current.toLocaleString('en-IN')}
                       </div>
-                      <div className="flex items-center gap-2 mt-0.5 text-[10px]">
-                        <span className={item.results_breakdown.revenue.delta_qoq_pct >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
+                      <div className="flex items-center gap-2 mt-1 text-[10px] tabular-numbers font-medium">
+                        <span className={item.results_breakdown.revenue.delta_qoq_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'}>
                           QoQ: {item.results_breakdown.revenue.delta_qoq_pct >= 0 ? '+' : ''}{item.results_breakdown.revenue.delta_qoq_pct}%
                         </span>
-                        <span className={item.results_breakdown.revenue.delta_yoy_pct >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
+                        <span className={item.results_breakdown.revenue.delta_yoy_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'}>
                           YoY: {item.results_breakdown.revenue.delta_yoy_pct >= 0 ? '+' : ''}{item.results_breakdown.revenue.delta_yoy_pct}%
                         </span>
                       </div>
                     </div>
 
                     {/* EBITDA */}
-                    <div className="p-2 rounded-lg bg-black/40 border border-gray-800">
-                      <div className="text-[10px] text-gray-400 font-medium">EBITDA ({item.results_breakdown.ebitda_margin_pct}%)</div>
-                      <div className="text-sm font-bold text-white">
+                    <div className="p-2.5 rounded-lg bg-[#141417] border border-white/[0.04]">
+                      <div className="text-[10px] uppercase text-[#86868b] font-medium">
+                        EBITDA ({item.results_breakdown.ebitda_margin_pct}%)
+                      </div>
+                      <div className="text-[14px] font-semibold text-white tabular-numbers mt-0.5">
                         ₹{item.results_breakdown.ebitda.current.toLocaleString('en-IN')}
                       </div>
-                      <div className="flex items-center gap-2 mt-0.5 text-[10px]">
-                        <span className={item.results_breakdown.ebitda.delta_qoq_pct >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
+                      <div className="flex items-center gap-2 mt-1 text-[10px] tabular-numbers font-medium">
+                        <span className={item.results_breakdown.ebitda.delta_qoq_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'}>
                           QoQ: {item.results_breakdown.ebitda.delta_qoq_pct >= 0 ? '+' : ''}{item.results_breakdown.ebitda.delta_qoq_pct}%
                         </span>
-                        <span className={item.results_breakdown.ebitda.delta_yoy_pct >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
+                        <span className={item.results_breakdown.ebitda.delta_yoy_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'}>
                           YoY: {item.results_breakdown.ebitda.delta_yoy_pct >= 0 ? '+' : ''}{item.results_breakdown.ebitda.delta_yoy_pct}%
                         </span>
                       </div>
                     </div>
 
                     {/* PBT */}
-                    <div className="p-2 rounded-lg bg-black/40 border border-gray-800">
-                      <div className="text-[10px] text-gray-400 font-medium">PBT</div>
-                      <div className="text-sm font-bold text-white">
+                    <div className="p-2.5 rounded-lg bg-[#141417] border border-white/[0.04]">
+                      <div className="text-[10px] uppercase text-[#86868b] font-medium">PBT</div>
+                      <div className="text-[14px] font-semibold text-white tabular-numbers mt-0.5">
                         ₹{item.results_breakdown.pbt.current.toLocaleString('en-IN')}
                       </div>
-                      <div className="flex items-center gap-2 mt-0.5 text-[10px]">
-                        <span className={item.results_breakdown.pbt.delta_qoq_pct >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
+                      <div className="flex items-center gap-2 mt-1 text-[10px] tabular-numbers font-medium">
+                        <span className={item.results_breakdown.pbt.delta_qoq_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'}>
                           QoQ: {item.results_breakdown.pbt.delta_qoq_pct >= 0 ? '+' : ''}{item.results_breakdown.pbt.delta_qoq_pct}%
                         </span>
-                        <span className={item.results_breakdown.pbt.delta_yoy_pct >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
+                        <span className={item.results_breakdown.pbt.delta_yoy_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'}>
                           YoY: {item.results_breakdown.pbt.delta_yoy_pct >= 0 ? '+' : ''}{item.results_breakdown.pbt.delta_yoy_pct}%
                         </span>
                       </div>
                     </div>
 
                     {/* PAT */}
-                    <div className="p-2 rounded-lg bg-black/40 border border-gray-800">
-                      <div className="text-[10px] text-gray-400 font-medium">PAT (Net Profit)</div>
-                      <div className="text-sm font-bold text-emerald-400">
+                    <div className="p-2.5 rounded-lg bg-[#141417] border border-white/[0.04]">
+                      <div className="text-[10px] uppercase text-[#86868b] font-medium">PAT (Net Profit)</div>
+                      <div className="text-[14px] font-semibold text-[#30d158] tabular-numbers mt-0.5">
                         ₹{item.results_breakdown.pat.current.toLocaleString('en-IN')}
                       </div>
-                      <div className="flex items-center gap-2 mt-0.5 text-[10px]">
-                        <span className={item.results_breakdown.pat.delta_qoq_pct >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
+                      <div className="flex items-center gap-2 mt-1 text-[10px] tabular-numbers font-medium">
+                        <span className={item.results_breakdown.pat.delta_qoq_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'}>
                           QoQ: {item.results_breakdown.pat.delta_qoq_pct >= 0 ? '+' : ''}{item.results_breakdown.pat.delta_qoq_pct}%
                         </span>
-                        <span className={item.results_breakdown.pat.delta_yoy_pct >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
+                        <span className={item.results_breakdown.pat.delta_yoy_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'}>
                           YoY: {item.results_breakdown.pat.delta_yoy_pct >= 0 ? '+' : ''}{item.results_breakdown.pat.delta_yoy_pct}%
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  <p className="text-[11px] text-gray-300 font-normal italic pt-1 border-t border-gray-800/80">
-                    💡 {item.results_breakdown.key_takeaway}
+                  <p className="text-[11px] text-[#86868b] leading-relaxed pt-2 border-t border-white/[0.06]">
+                    <span className="text-white font-medium">Analysis:</span> {item.results_breakdown.key_takeaway}
                   </p>
                 </div>
               )}
 
-              {/* SPECIAL ENRICHMENT 2: Management Change Executive Bio & Context */}
+              {/* ENRICHMENT 2: Executive Pedigree for Management Changes */}
               {hasBio && (
-                <div className="mt-3 p-3 rounded-xl bg-indigo-950/40 border border-indigo-500/30 space-y-2">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold text-indigo-300 flex items-center gap-1.5">
-                      <UserCheck className="w-3.5 h-3.5" />
-                      Incoming Leadership Background
-                    </span>
-                    <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-200 font-semibold uppercase">
+                <div className="mt-3 p-3.5 rounded-xl bg-black/50 border border-white/[0.08] space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-white">Executive Appointment</span>
+                    <span className="text-[10px] text-[#86868b] uppercase tracking-wide">
                       {item.executive_bio.role}
                     </span>
                   </div>
 
-                  <div className="text-xs space-y-1.5 text-gray-300">
-                    <div className="font-semibold text-white">
-                      {item.executive_bio.name} • <span className="text-gray-400 font-normal">Ex-{item.executive_bio.previous_firm} ({item.executive_bio.previous_role})</span>
+                  <div className="text-xs space-y-1 text-[#a1a1a6]">
+                    <div className="font-medium text-white">
+                      {item.executive_bio.name} • <span className="text-[#86868b]">Ex-{item.executive_bio.previous_firm}</span>
                     </div>
-                    <p className="text-[11px] leading-relaxed text-gray-300">
+                    <p className="text-[12px] leading-relaxed text-[#86868b]">
                       {item.executive_bio.career_summary}
                     </p>
-                    <div className="p-2 rounded bg-black/40 text-[11px] text-indigo-200 border border-indigo-500/20">
-                      🎯 <span className="font-medium">Strategic Impact:</span> {item.executive_bio.strategic_implication}
+                    <div className="p-2 rounded-lg bg-[#141417] text-[11px] text-[#d1d1d6] border border-white/[0.04]">
+                      <span className="text-white font-medium">Strategic Implications:</span> {item.executive_bio.strategic_implication}
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* Footer Actions: BSE Filing Link & Research Deep Dive */}
-              <div className="flex items-center justify-between pt-2 border-t border-gray-800/60 text-xs">
+              {/* Action Bar */}
+              <div className="flex items-center justify-between pt-2 border-t border-white/[0.06] text-xs">
                 <button
                   onClick={() => onSelectSymbol(item.symbol)}
-                  className="text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-1 transition-colors"
+                  className="text-white hover:text-[#2997ff] font-medium flex items-center gap-1 transition-colors"
                 >
-                  <span>Pull Fundamentals</span>
-                  <ArrowUpRight className="w-3 h-3" />
+                  <span>Open Terminal</span>
+                  <ArrowUpRight className="w-3.5 h-3.5" />
                 </button>
 
                 {item.source_url && (
@@ -335,9 +303,9 @@ export default function PushFeed({
                     href={item.source_url}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-gray-400 hover:text-gray-200 flex items-center gap-1 text-[11px] transition-colors"
+                    className="text-[#86868b] hover:text-white flex items-center gap-1 text-[11px] transition-colors"
                   >
-                    <span>Primary Filing (PDF)</span>
+                    <span>Filing PDF</span>
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 )}
@@ -347,30 +315,29 @@ export default function PushFeed({
         })}
       </div>
 
-      {/* Routine Filings Collapsible Drawer (Burying the noise cleanly) */}
+      {/* Routine Paperwork Collapsed Section */}
       {digest?.routine_announcements && digest.routine_announcements.length > 0 && !highSignalOnly && (
-        <div className="glass-panel rounded-2xl p-3 border border-gray-800/60">
+        <div className="apple-card rounded-2xl p-3.5">
           <button
             onClick={() => setShowRoutine(!showRoutine)}
-            className="w-full flex items-center justify-between text-xs font-semibold text-gray-400 hover:text-gray-200 transition-colors"
+            className="w-full flex items-center justify-between text-xs font-medium text-[#86868b] hover:text-white transition-colors"
           >
-            <div className="flex items-center gap-1.5">
-              <FileText className="w-3.5 h-3.5 text-gray-500" />
-              <span>Routine Disclosures & Filings ({digest.routine_announcements.length} Collapsed)</span>
+            <div className="flex items-center gap-2">
+              <FileText className="w-3.5 h-3.5" />
+              <span>Routine Disclosures ({digest.routine_announcements.length} Collapsed)</span>
             </div>
             {showRoutine ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
 
           {showRoutine && (
-            <div className="mt-3 space-y-2 pt-2 border-t border-gray-800/60">
+            <div className="mt-3 space-y-2 pt-2 border-t border-white/[0.06]">
               {digest.routine_announcements.map((routine) => (
-                <div key={routine.id} className="p-2.5 rounded-xl bg-black/30 text-xs text-gray-400 space-y-1">
+                <div key={routine.id} className="p-2 rounded-lg bg-black/40 text-xs space-y-1">
                   <div className="flex items-center justify-between text-[11px]">
-                    <span className="font-bold text-gray-300">{routine.company_name}</span>
-                    <span className="text-[10px] text-gray-500">{routine.timestamp}</span>
+                    <span className="font-semibold text-white">{routine.company_name}</span>
+                    <span className="text-[10px] text-[#515156]">{routine.timestamp}</span>
                   </div>
-                  <div className="text-gray-300 text-xs">{routine.title}</div>
-                  <div className="text-[11px] text-gray-500 italic">{routine.summary_one_liner}</div>
+                  <div className="text-[11px] text-[#86868b]">{routine.title}</div>
                 </div>
               ))}
             </div>
