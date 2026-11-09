@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ArrowUp, ShieldCheck } from 'lucide-react';
 import { askCopilot } from '../services/api';
 
-export default function CopilotChat({ selectedSymbol, portfolio = [] }) {
+export default function CopilotChat({ selectedSymbol }) {
   const [messages, setMessages] = useState([
     {
       id: 'init-1',
@@ -57,7 +57,7 @@ export default function CopilotChat({ selectedSymbol, portfolio = [] }) {
         citations: resp.grounded_citations || []
       };
       setMessages((prev) => [...prev, botMsg]);
-    } catch (err) {
+    } catch {
       setMessages((prev) => [
         ...prev,
         {

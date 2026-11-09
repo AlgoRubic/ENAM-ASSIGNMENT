@@ -21,10 +21,50 @@ export default function PullTerminal({
   isLoading = false 
 }) {
   const [activeModule, setActiveModule] = useState('business');
+  const [showEvidence, setShowEvidence] = useState(false);
 
   if (isLoading || !analysis) {
     return <TerminalSkeleton />;
   }
+
+  // Honest failure states: never show another company's data
+  if (analysis.error) {
+    return (
+      <div className="pb-24 smooth-fade-in">
+        <div className="rounded-2xl bg-[#1c1c1e] border border-white/[0.08] p-5 space-y-2" role="alert">
+          <div className="text-[13px] uppercase tracking-wide text-[#ff453a] font-semibold">
+            {analysis.status === 'offline' ? 'Backend Offline' : 'Unavailable'}
+          </div>
+          <div className="text-[17px] font-semibold text-white">{selectedSymbol}</div>
+          <p className="text-[15px] text-[#a1a1a6] leading-relaxed">{analysis.message}</p>
+          <p className="text-[14px] text-[#86868b]">No analysis is shown because FINN never substitutes data from another company.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (analysis.provenance_status === 'market_data_only') {
+    return (
+      <div className="pb-24 smooth-fade-in space-y-3">
+        <div className="rounded-2xl bg-[#1c1c1e] border border-white/[0.08] p-5">
+          <div className="text-[13px] uppercase tracking-wide text-[#86868b]">{analysis.symbol}</div>
+          <div className="text-[20px] font-semibold text-white">{analysis.company_name}</div>
+          <div className="mt-2 text-[24px] font-semibold text-white tabular-numbers">
+            ₹{analysis.last_price?.toLocaleString('en-IN')}
+            <span className={`ml-2 text-[15px] ${analysis.day_change_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'}`}>
+              {analysis.day_change_pct >= 0 ? '+' : ''}{analysis.day_change_pct}%
+            </span>
+          </div>
+        </div>
+        <div className="rounded-2xl bg-[#ff9f0a]/10 border border-[#ff9f0a]/25 p-5" role="status">
+          <div className="text-[14px] font-semibold text-[#ff9f0a] mb-1">Price data available · Primary research unavailable</div>
+          <p className="text-[15px] text-[#d1d1d6] leading-relaxed">{analysis.provenance_note}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const wc = analysis.what_changed;
 
   const modules = [
     { id: 'business', label: 'Business', icon: Building2 },
@@ -60,6 +100,69 @@ export default function PullTerminal({
           );
         })}
       </div>
+
+      {/* Evidence-First "What Changed?" Card */}
+      {wc && (
+        <div className="rounded-2xl bg-[#1c1c1e] border border-[#2997ff]/25 p-5 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[13px] uppercase tracking-wide font-semibold text-[#2997ff]">What changed?</span>
+            <span className="text-[13px] text-[#86868b]">{wc.filing_date}</span>
+          </div>
+          <h2 className="text-[17px] font-semibold text-white leading-snug">{wc.event_title}</h2>
+          <p className="text-[15px] text-[#d1d1d6] leading-relaxed">{wc.what_changed}</p>
+          <div className="text-[14px] text-[#a1a1a6] leading-relaxed">
+            <span className="font-semibold text-white">Prior expectation: </span>{wc.prior_guidance_contradicted}
+          </div>
+          <div className="text-[14px] text-[#a1a1a6] leading-relaxed">
+            <span className="font-semibold text-white">Investor impact: </span>{wc.investor_impact}
+          </div>
+          <div className="flex items-center justify-between pt-1">
+            <span className="text-[13px] text-[#30d158]">{wc.confidence_level}</span>
+            <button
+              onClick={() => setShowEvidence(true)}
+              className="px-3 py-1.5 rounded-full bg-white text-black text-[14px] font-semibold active:scale-95"
+            >
+              View source
+            </button>
+          </div>
+        </div>
+      )}
+
+      {wc && showEvidence && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Primary source evidence"
+          className="fixed inset-0 z-50 bg-black/70 flex items-end justify-center"
+          onClick={() => setShowEvidence(false)}
+          onKeyDown={(e) => e.key === 'Escape' && setShowEvidence(false)}
+        >
+          <div
+            className="w-full max-w-md bg-[#1c1c1e] rounded-t-3xl p-5 space-y-3 border-t border-white/[0.1]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-[17px] font-semibold text-white">Evidence</span>
+              <button autoFocus onClick={() => setShowEvidence(false)} aria-label="Close evidence" className="text-[15px] text-[#2997ff]">Done</button>
+            </div>
+            <div className="text-[15px] font-medium text-white">{wc.evidence.title}</div>
+            <dl className="grid grid-cols-3 gap-y-1.5 text-[14px]">
+              <dt className="text-[#86868b]">Document</dt><dd className="col-span-2 text-white font-mono break-all">{wc.evidence.doc_id}</dd>
+              <dt className="text-[#86868b]">Period</dt><dd className="col-span-2 text-white">{wc.evidence.period}</dd>
+              <dt className="text-[#86868b]">Filed</dt><dd className="col-span-2 text-white">{wc.evidence.filing_date}</dd>
+              <dt className="text-[#86868b]">Page</dt><dd className="col-span-2 text-white">{wc.evidence.page_number}</dd>
+              <dt className="text-[#86868b]">SHA-256</dt><dd className="col-span-2 text-[#a1a1a6] font-mono text-[12px] break-all">{wc.evidence.document_hash}</dd>
+            </dl>
+            <blockquote className="rounded-xl bg-black/40 p-3 text-[14px] text-[#d1d1d6] leading-relaxed border-l-2 border-[#2997ff]">
+              {wc.evidence.exact_table_snippet}
+            </blockquote>
+            <p className="text-[13px] text-[#86868b]">{wc.evidence.context_note}</p>
+            <a href={wc.evidence.source_url} target="_blank" rel="noreferrer" className="block text-center py-2.5 rounded-xl bg-white/[0.08] text-[15px] text-white">
+              Open original filing
+            </a>
+          </div>
+        </div>
+      )}
 
       {/* Apple Stocks Style Hero Header */}
       <div className="apple-card rounded-2xl p-5 space-y-4">

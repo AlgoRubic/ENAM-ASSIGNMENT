@@ -84,6 +84,25 @@ def answer_investor_query(symbol: Optional[str], question: str) -> CopilotQueryR
     snippets = PRIMARY_SNIPPETS.get(sym, [])
     analysis = build_dynamic_pull_analysis(sym)
 
+    # 1. Honest refusal for unindexed tickers (Never invent guidance or concall quotes)
+    if analysis.provenance_status == "market_data_only":
+        vol_str = f"{analysis.volume:,}" if analysis.volume else "N/A"
+        return CopilotQueryResponse(
+            symbol=sym,
+            answer=(
+                f"**Primary Intelligence Unavailable for {analysis.company_name} ({sym})**\n\n"
+                f"• **Live Market Price**: ₹{analysis.last_price:,.2f} ({analysis.day_change_pct:+}%, Volume: {vol_str})\n\n"
+                f"**Data Integrity Notice**: Audited Annual Reports and Earnings Concall Transcripts for `{sym}` have not been indexed "
+                f"in FINN's verified primary document pipeline (currently verified benchmark holdings: **ZOMATO.NS**, **TATAMOTORS.NS**, **RELIANCE.NS**).\n\n"
+                f"In strict adherence to institutional data trust, FINN refuses to generate synthetic estimates, "
+                f"hallucinated management commitments, or speculative concall commentary."
+            ),
+            grounded_citations=[],
+            key_takeaway=f"Verified primary filings for {sym} not indexed; synthetic data generation refused.",
+            confidence=1.0,
+            provenance="market_data_only"
+        )
+
     # Check for direct Gemini API call if key is configured
     if GEMINI_API_KEY:
         try:

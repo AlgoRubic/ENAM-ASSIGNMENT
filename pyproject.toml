@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=65.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "finn-investment-agent"
+version = "1.0.0"
+description = "Mobile-First Financial Investment Agent for Public-Markets Portfolios (ENAM Holdings Build Challenge)"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "yfinance>=0.2.40",
+    "pydantic>=2.8.0",
+    "beautifulsoup4>=4.12.0",
+    "requests>=2.31.0",
+    "httpx>=0.27.0",
+    "pandas>=2.2.0",
+    "pytest>=8.0.0"
+]
+
+[tool.pytest.ini_options]
+testpaths = ["backend/tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+pythonpath = ["backend"]
+addopts = "-v --tb=short"

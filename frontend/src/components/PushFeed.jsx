@@ -8,9 +8,7 @@ import {
   SlidersHorizontal,
   FileText,
   Calendar,
-  Sparkles,
-  Zap,
-  Activity
+  Zap
 } from 'lucide-react';
 import { FeedSkeleton } from './Skeletons';
 

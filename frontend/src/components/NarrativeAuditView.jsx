@@ -4,8 +4,7 @@ import {
   AlertTriangle, 
   Clock, 
   Quote, 
-  FileSpreadsheet, 
-  ShieldCheck 
+  FileSpreadsheet
 } from 'lucide-react';
 import { AuditSkeleton } from './Skeletons';
 

@@ -4,10 +4,7 @@ import { Search, SlidersHorizontal } from 'lucide-react';
 export default function Header({ 
   alertCount, 
   onOpenSettings, 
-  onOpenSearch, 
-  activeTab,
-  selectedSymbol,
-  portfolio = [] 
+  onOpenSearch
 }) {
   return (
     <header className="sticky top-0 z-40 bg-black/80 backdrop-blur-2xl border-b border-white/[0.06] px-4 py-2.5">
@@ -41,6 +38,7 @@ export default function Header({
             onClick={onOpenSearch}
             className="w-8 h-8 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.08] text-[#86868b] hover:text-white transition-all flex items-center justify-center active:scale-95"
             title="Search Tickers"
+            aria-label="Search Tickers"
           >
             <Search className="w-3.5 h-3.5" />
           </button>
@@ -50,6 +48,7 @@ export default function Header({
             onClick={onOpenSettings}
             className="relative w-8 h-8 rounded-full bg-white/[0.06] hover:bg-white/[0.12] border border-white/[0.08] text-[#86868b] hover:text-white transition-all flex items-center justify-center active:scale-95"
             title="Filter Thresholds"
+            aria-label="Filter Thresholds"
           >
             <SlidersHorizontal className="w-3.5 h-3.5" />
             {alertCount > 0 && (
