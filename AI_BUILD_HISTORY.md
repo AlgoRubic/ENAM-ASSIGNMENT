@@ -1,6 +1,6 @@
 # FINN AI Build History
 
-This repository was built iteratively with an AI coding agent and reviewed against the ENAM FINN build challenge.
+This repository was built primarily in Antigravity, then reviewed and submission-prepared in Codex/ChatGPT against the ENAM FINN build challenge.
 
 ## Build record
 
@@ -10,14 +10,19 @@ This repository was built iteratively with an AI coding agent and reviewed again
 - Added Evidence Health telemetry so reviewers can inspect coverage, freshness, citations, formulas, and blockers in-app.
 - Added the News Cockpit: browser-native audio navigation, saved stories, sharing/copying, and a morning-brief export.
 - Fixed speech-transition races so stale browser speech callbacks cannot hide the active Stop control.
-- Verified the final state with 15 passing backend tests, provenance verification, frontend lint, and a production build.
+- Codex/ChatGPT performed the independent review, fixed the audio transition race, prepared the submission documents, and verified the final state with 15 passing backend tests, provenance verification, frontend lint, and a production build.
 
 ## Conversation links
 
-The ENAM brief asks for the coding-agent and LLM build history. The Codex thread has a public share link. Antigravity currently exposes this conversation only through its local app URL, so the exact conversation title and local identifier are recorded below rather than inventing a public URL.
+The ENAM brief asks for the coding-agent and LLM build history. Antigravity contains the main implementation history; Codex/ChatGPT contains the review, fixes, and submission preparation. The Codex thread has a public share link. Antigravity currently exposes this conversation only through its local app URL, so the exact conversation title and local identifier are recorded below rather than inventing a public URL.
 
 - **Codex / ChatGPT build conversation:** https://chatgpt.com/s/cx_6af97fc88cc081919b6098da68974588
 - **Antigravity build conversation:** `Evidence Health Panel Implementation` — local conversation URL: https://127.0.0.1:57598/c/88c45bc3-224d-4c79-89e7-e5f2536c1c3d?project=outside-of-project
+
+### Exported Antigravity transcript
+
+- Human-readable full transcript: [`AI_CHAT_TRANSCRIPT.md`](AI_CHAT_TRANSCRIPT.md) — 146 logged steps.
+- Machine-readable session log: [`AI_CHAT_TRANSCRIPT.jsonl`](AI_CHAT_TRANSCRIPT.jsonl) — 146 valid JSONL records.
 
 ### Antigravity export note
 
