@@ -20,6 +20,13 @@ dependencies = [
     "pytest>=8.0.0"
 ]
 
+# The repository is deployed as a Vercel FastAPI function rather than as a
+# Python wheel. Keep the root project metadata dependency-only so setuptools
+# does not try to package the sibling api/backend/frontend directories.
+[tool.setuptools]
+packages = []
+py-modules = []
+
 [tool.pytest.ini_options]
 testpaths = ["backend/tests"]
 python_files = ["test_*.py"]

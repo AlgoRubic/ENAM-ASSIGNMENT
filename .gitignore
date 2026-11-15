@@ -18,3 +18,5 @@ dist/
 .idea/
 *.swp
 Thumbs.db
+
+.vercel
