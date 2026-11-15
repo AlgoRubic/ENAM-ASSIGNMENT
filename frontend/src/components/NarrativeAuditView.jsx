@@ -7,13 +7,17 @@ import {
   FileSpreadsheet
 } from 'lucide-react';
 import { AuditSkeleton } from './Skeletons';
+import EvidenceHealthPanel from './EvidenceHealthPanel';
 
 export default function NarrativeAuditView({ 
   analysis, 
   selectedSymbol, 
   onSelectSymbol, 
   portfolio = [],
-  isLoading = false 
+  isLoading = false,
+  auditSummary = null,
+  loadingAuditSummary = false,
+  onRefreshAuditSummary
 }) {
   if (isLoading || !analysis) {
     return <AuditSkeleton />;
@@ -23,6 +27,14 @@ export default function NarrativeAuditView({
   if (analysis.provenance_status === 'market_data_only' || !analysis.narrative_audit) {
     return (
       <div className="space-y-4 pb-24 smooth-fade-in">
+        <EvidenceHealthPanel
+          auditSummary={auditSummary}
+          isLoading={loadingAuditSummary}
+          onRefresh={onRefreshAuditSummary}
+          onSelectSymbol={onSelectSymbol}
+          defaultExpanded={false}
+        />
+
         {/* Ticker Selector */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
           {portfolio.map((stock) => {
@@ -48,13 +60,13 @@ export default function NarrativeAuditView({
             {analysis.symbol} • Narrative vs Numbers Audit
           </div>
           <h2 className="text-lg font-semibold text-white">
-            Primary Transcripts Not Yet Indexed
+            Primary Q2 FY25 Filings Not Yet Indexed
           </h2>
           <p className="text-sm text-[#a1a1a6] leading-relaxed">
-            Earnings concall transcripts and quarterly investor presentation audits are currently indexed for FINN benchmark holdings: <span className="text-white font-semibold">ZOMATO.NS</span>, <span className="text-white font-semibold">TATAMOTORS.NS</span>, and <span className="text-white font-semibold">RELIANCE.NS</span>.
+            Q2 FY25 exchange filings, earnings-call transcript (Tata Motors), and investor presentation (Reliance) are currently indexed for FINN benchmark holdings: <span className="text-white font-semibold">ZOMATO.NS</span>, <span className="text-white font-semibold">TATAMOTORS.NS</span>, and <span className="text-white font-semibold">RELIANCE.NS</span>.
           </p>
           <div className="p-3.5 rounded-xl bg-[#ff9f0a]/10 border border-[#ff9f0a]/20 text-xs text-[#ff9f0a] leading-relaxed">
-            FINN strictly enforces a zero-fabrication standard: management guidance promises, delivery verdicts, and credibility scores are never synthetically simulated without audited concall filings.
+            FINN strictly enforces a zero-fabrication standard: management guidance promises, delivery verdicts, and credibility scores are never synthetically simulated without indexed primary filings.
           </div>
         </div>
       </div>
@@ -88,6 +100,13 @@ export default function NarrativeAuditView({
 
   return (
     <div className="space-y-4 pb-24 smooth-fade-in">
+      <EvidenceHealthPanel
+        auditSummary={auditSummary}
+        isLoading={loadingAuditSummary}
+        onRefresh={onRefreshAuditSummary}
+        onSelectSymbol={onSelectSymbol}
+        defaultExpanded={false}
+      />
       
       {/* Ticker Selector */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
@@ -114,7 +133,7 @@ export default function NarrativeAuditView({
         <div className="flex items-start justify-between">
           <div className="space-y-1">
             <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">
-              Forensic Audit • 4 Quarters
+              Forensic Audit • Q2 FY25 Verified Filing
             </span>
             <h1 className="text-[20px] font-semibold text-white tracking-tight leading-tight">
               Narrative vs. Numbers: {analysis.company_name}
@@ -154,11 +173,11 @@ export default function NarrativeAuditView({
         )}
       </div>
 
-      {/* 4 Quarters Audited Timeline */}
+      {/* Indexed Q2 FY25 Audit Timeline */}
       <div className="space-y-3">
         <div className="flex items-center justify-between px-1">
           <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">
-            Quarterly Breakdown (Concalls vs. Filings)
+            Q2 FY25 Audit Breakdown (Management Commentary vs. Filings)
           </span>
           <span className="text-[11px] text-[#515156]">Primary Evidence</span>
         </div>

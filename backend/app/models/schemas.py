@@ -50,6 +50,8 @@ class ResultsBreakdown(BaseModel):
     pat: FinancialDelta
     ebitda_margin_pct: float
     pat_margin_pct: float
+    ebitda_margin_formula: str = ""
+    pat_margin_formula: str = ""
     key_takeaway: str
     evidence: Optional[EvidenceDrawerItem] = None
 
@@ -76,9 +78,10 @@ class AnnouncementItem(BaseModel):
     id: str
     symbol: str
     company_name: str
-    filing_date: str = "Oct 2024"
-    timestamp: str = "Recent"
-    hours_ago: int = 2
+    filing_date: str = "October 2024"
+    publication_timestamp: str = "2024-10-22T15:30:00Z"
+    timestamp: str = "October 2024"
+    hours_ago: int = 0
     title: str
     category: str
     priority: int
@@ -101,8 +104,11 @@ class UnusualMoveAlert(BaseModel):
     volume_multiplier: float
     alert_type: str
     reasoning: str
-    timestamp: str = "Today (EOD)"
+    timestamp: str = "Cached Demo Snapshot (As of 2024-11-08)"
     hours_ago: int = 0
+    is_live: bool = False
+    data_status: str = "cached_demo_snapshot"
+    as_of_date: str = "2024-11-08"
 
 class UnifiedAlert(BaseModel):
     id: str
@@ -111,8 +117,12 @@ class UnifiedAlert(BaseModel):
     alert_type: str  # "MARKET_ANOMALY" | "MATERIAL_FILING"
     headline: str
     detail: str
-    timestamp: str = "Recent"
-    hours_ago: int = 2
+    timestamp: str = "Cached Demo Snapshot (As of 2024-11-08)"
+    publication_timestamp: Optional[str] = None
+    hours_ago: int = 0
+    is_live: bool = False
+    data_status: str = "cached_demo_snapshot"
+    as_of_date: str = "2024-11-08"
     price: Optional[float] = None
     change_pct: Optional[float] = None
     volume_mult: Optional[float] = None
@@ -122,6 +132,8 @@ class UnifiedAlert(BaseModel):
 
 class PushDigestResponse(BaseModel):
     window_hours: int
+    feed_mode: str = "live_current_window"
+    as_of_timestamp: str = ""
     total_announcements: int
     material_count: int
     collapsed_routine_count: int
@@ -144,6 +156,8 @@ class FinancialSnapshot(BaseModel):
     pat_cr: float
     ebitda_margin: float
     pat_margin: float
+    ebitda_margin_formula: str = ""
+    pat_margin_formula: str = ""
     roce: float
     roe: float
     pe_ratio: Optional[float] = None
@@ -172,8 +186,10 @@ class CashQuality(BaseModel):
     cfo_cr: float
     pat_cr: float
     cash_conversion_ratio: float
+    cash_conversion_formula: str = ""
     fcf_cr: float
     capital_expenditure_cr: float
+    fcf_formula: str = ""
     divergence_flag: bool
     commentary: str
     primary_citations: List[PrimarySourceCitation]
@@ -216,7 +232,9 @@ class CompanyPullAnalysis(BaseModel):
     sector: str
     provenance_status: str  # "indexed_primary" | "market_data_only" | "unavailable"
     provenance_note: str
-    data_source: str  # "verified_primary_store" | "live_exchange_feed"
+    data_source: str  # "verified_primary_store" | "live_exchange_feed" | "cached_demo_snapshot"
+    market_data_status: str = "cached_demo_snapshot"
+    market_as_of_date: str = "2024-11-08"
     last_price: float
     day_change_pct: float
     volume: Optional[int] = None
@@ -247,3 +265,51 @@ class CopilotQueryResponse(BaseModel):
     key_takeaway: str
     confidence: float = 1.0
     provenance: str = "indexed_primary"
+
+
+# --- Evidence Health & Provenance Audit Summary Schemas ---
+
+class AuditSummaryMetric(BaseModel):
+    id: str
+    label: str
+    value: str
+    status: str  # "green" | "amber" | "red"
+    detail: str
+    items: List[str] = []
+
+
+class AuditSummaryResponse(BaseModel):
+    overall_status: str  # "green" | "amber" | "red"
+    provenance_audit_passed: bool
+    indexed_ticker_count: int
+    indexed_tickers: List[str]
+    portfolio_ticker_count: int
+    market_data_only_ticker_count: int
+    ad_hoc_ticker_count: int
+    indexed_companies: List[Dict[str, Any]] = []
+    local_pdf_count: int
+    local_pdfs: List[Dict[str, Any]] = []
+    verified_citation_count: int
+    total_citation_count: int
+    verified_quote_count: int
+    what_changed_evidence_verified_count: int
+    narrative_audit_evidence_verified_count: int
+    sqlite_announcements_verified_count: int
+    sqlite_announcements_total: int
+    formula_audit_status: str  # "passed" | "failed"
+    formula_audit_passed: bool
+    formula_checks_passed: int
+    formula_checks_total: int
+    formula_audit_details: List[Dict[str, Any]] = []
+    market_data_status: str  # "live_eod" | "mixed_live_and_cached" | "cached_demo_snapshot"
+    market_as_of_date: str
+    live_ticker_count: int
+    cached_ticker_count: int
+    current_feed_mode: str  # "live_current_window" | "historical_q2_fy25_demo" | "custom_as_of_window"
+    feed_mode: str
+    as_of_timestamp: str
+    historical_anchor_timestamp: str
+    submission_blockers: List[str] = []
+    submission_blocker_details: List[Dict[str, str]] = []
+    provenance_errors: List[str] = []
+    metrics: List[AuditSummaryMetric] = []

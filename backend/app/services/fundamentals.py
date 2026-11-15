@@ -57,13 +57,20 @@ def get_company_analysis(symbol: str) -> CompanyPullAnalysis:
         )
 
         fin_cits = [PrimarySourceCitation(**c) for c in raw["financial_snapshot"]["primary_citations"]]
+        rev_cr = float(raw["financial_snapshot"]["revenue_cr"])
+        ebitda_cr = float(raw["financial_snapshot"]["ebitda_cr"])
+        pat_cr = float(raw["financial_snapshot"]["pat_cr"])
+        ebitda_margin = round((ebitda_cr / rev_cr) * 100.0, 2) if rev_cr else raw["financial_snapshot"]["ebitda_margin"]
+        pat_margin = round((pat_cr / rev_cr) * 100.0, 2) if rev_cr else raw["financial_snapshot"]["pat_margin"]
         fin = FinancialSnapshot(
             period=raw["financial_snapshot"]["period"],
-            revenue_cr=raw["financial_snapshot"]["revenue_cr"],
-            ebitda_cr=raw["financial_snapshot"]["ebitda_cr"],
-            pat_cr=raw["financial_snapshot"]["pat_cr"],
-            ebitda_margin=raw["financial_snapshot"]["ebitda_margin"],
-            pat_margin=raw["financial_snapshot"]["pat_margin"],
+            revenue_cr=rev_cr,
+            ebitda_cr=ebitda_cr,
+            pat_cr=pat_cr,
+            ebitda_margin=ebitda_margin,
+            pat_margin=pat_margin,
+            ebitda_margin_formula=f"(EBITDA / Revenue) = (₹{ebitda_cr:,.0f} Cr / ₹{rev_cr:,.0f} Cr) = {ebitda_margin}%",
+            pat_margin_formula=f"(PAT / Revenue) = (₹{pat_cr:,.0f} Cr / ₹{rev_cr:,.0f} Cr) = {pat_margin}%",
             roce=raw["financial_snapshot"]["roce"],
             roe=raw["financial_snapshot"]["roe"],
             pe_ratio=raw["financial_snapshot"].get("pe_ratio"),
@@ -94,12 +101,19 @@ def get_company_analysis(symbol: str) -> CompanyPullAnalysis:
         )
 
         cash_cits = [PrimarySourceCitation(**c) for c in raw["cash_quality"]["primary_citations"]]
+        cfo_cr = float(raw["cash_quality"]["cfo_cr"])
+        cq_pat_cr = float(raw["cash_quality"]["pat_cr"])
+        capex_cr = float(raw["cash_quality"]["capital_expenditure_cr"])
+        cc_ratio = round(cfo_cr / cq_pat_cr, 2) if cq_pat_cr else raw["cash_quality"]["cash_conversion_ratio"]
+        fcf_cr = round(cfo_cr - capex_cr, 2)
         cash = CashQuality(
-            cfo_cr=raw["cash_quality"]["cfo_cr"],
-            pat_cr=raw["cash_quality"]["pat_cr"],
-            cash_conversion_ratio=raw["cash_quality"]["cash_conversion_ratio"],
-            fcf_cr=raw["cash_quality"]["fcf_cr"],
-            capital_expenditure_cr=raw["cash_quality"]["capital_expenditure_cr"],
+            cfo_cr=cfo_cr,
+            pat_cr=cq_pat_cr,
+            cash_conversion_ratio=cc_ratio,
+            cash_conversion_formula=f"CFO / PAT = ₹{cfo_cr:,.0f} Cr / ₹{cq_pat_cr:,.0f} Cr = {cc_ratio}x",
+            fcf_cr=fcf_cr,
+            capital_expenditure_cr=capex_cr,
+            fcf_formula=f"CFO - Capex = ₹{cfo_cr:,.0f} Cr - ₹{capex_cr:,.0f} Cr = ₹{fcf_cr:,.0f} Cr",
             divergence_flag=raw["cash_quality"]["divergence_flag"],
             commentary=raw["cash_quality"]["commentary"],
             primary_citations=cash_cits
@@ -165,6 +179,8 @@ def get_company_analysis(symbol: str) -> CompanyPullAnalysis:
             provenance_status=raw["provenance_status"],
             provenance_note=raw["provenance_note"],
             data_source=raw["data_source"],
+            market_data_status=eod.get("data_status", "cached_demo_snapshot"),
+            market_as_of_date=eod.get("as_of_date", "2024-11-08"),
             last_price=eod["price"],
             day_change_pct=eod["change_pct"],
             volume=eod.get("volume"),
@@ -207,18 +223,29 @@ def get_company_analysis(symbol: str) -> CompanyPullAnalysis:
         mcap = None
         pe = None
 
+    is_live_eod = bool(eod.get("live", False))
+    m_status = eod.get("data_status", "live_eod" if is_live_eod else "cached_demo_snapshot")
+    m_as_of = eod.get("as_of_date", "2024-11-08")
+    price_origin_label = (
+        f"Live NSE EOD price & volume data (as of {m_as_of})"
+        if is_live_eod
+        else f"Cached demo EOD snapshot price & volume data (as of {m_as_of})"
+    )
+
     return CompanyPullAnalysis(
         symbol=sym,
         company_name=company_name,
         sector=sector,
         provenance_status="market_data_only",
         provenance_note=(
-            f"Live market price & volume data is tracked via NSE. "
-            f"However, verified primary documents (Annual Reports and Concall Transcripts) have not been ingested "
+            f"{price_origin_label} is available. "
+            f"However, verified primary documents (Q2 FY25 Results and Concall Transcripts) have not been ingested "
             f"into FINN's pipeline for this ticker. FINN strictly refuses to hallucinate corporate guidance, "
             f"narrative audits, or financial projections."
         ),
-        data_source="live_exchange_feed",
+        data_source="live_exchange_feed" if is_live_eod else "cached_demo_snapshot",
+        market_data_status=m_status,
+        market_as_of_date=m_as_of,
         last_price=eod["price"],
         day_change_pct=eod["change_pct"],
         volume=eod.get("volume"),

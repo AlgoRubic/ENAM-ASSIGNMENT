@@ -9,12 +9,10 @@ export default function CopilotChat({ selectedSymbol }) {
       id: 'init-1',
       sender: 'bot',
       text: isIndexed
-        ? `Primary Research Terminal active for ${selectedSymbol || "ZOMATO.NS"}.\n\nAll queries are verified against audited Annual Reports, quarterly exchange filings, and earnings call transcripts. Broker commentary and news sentiment are excluded.\n\nSelect a prompt below or enter an investigation query.`
-        : `Primary Research Terminal active for ${selectedSymbol}.\n\nNotice: This company has not yet been indexed in the primary regulatory document store. The system strictly provides real-time market data and refuses to fabricate guidance or financial metrics.\n\nIndexed companies with full primary document provenance: ZOMATO.NS, TATAMOTORS.NS, RELIANCE.NS.`,
-      takeaway: isIndexed ? 'Grounded strictly in primary exchange records.' : 'Market data only; no synthetic guidance.',
-      citations: isIndexed ? [
-        { doc_type: 'Annual Report FY24 & Q2 FY25 Filings', period: 'FY24-FY25', page_or_time: 'Regulatory Disclosure', exact_quote: 'Direct extraction from verified exchange filings.' }
-      ] : []
+        ? `Primary Research Terminal active for ${selectedSymbol || "ZOMATO.NS"}.\n\nResponses are grounded only when matching stored evidence exists in our indexed Q2 FY25 exchange filings, earnings-call transcript (Tata Motors), and investor presentation (Reliance); otherwise the agent returns an explicit refusal or no-citation response. Broker commentary and news sentiment are excluded.\n\nSelect a prompt below or enter an investigation query.`
+        : `Primary Research Terminal active for ${selectedSymbol}.\n\nNotice: This company has not yet been indexed in the primary regulatory document store. The system strictly provides market data and refuses to fabricate guidance or financial metrics.\n\nIndexed companies with verified Q2 FY25 primary document provenance: ZOMATO.NS, TATAMOTORS.NS, RELIANCE.NS.`,
+      takeaway: isIndexed ? 'Grounded when matching Q2 FY25 stored evidence exists; otherwise explicit refusal/no-citation.' : 'Market data only; no synthetic guidance.',
+      citations: []
     }
   ]);
   const [input, setInput] = useState('');
@@ -22,7 +20,7 @@ export default function CopilotChat({ selectedSymbol }) {
   const messagesEndRef = useRef(null);
 
   const quickPrompts = [
-    "Audit guidance vs delivery over 4 quarters",
+    "Audit Q2 FY25 guidance vs delivery",
     "Analyze cash conversion ratio & FCF",
     "Operating EBITDA margin trajectory",
     "Primary bull vs bear thesis",
@@ -116,8 +114,17 @@ export default function CopilotChat({ selectedSymbol }) {
               {msg.citations && msg.citations.length > 0 && (
                 <div className="mt-1.5 space-y-1">
                   {msg.citations.map((c, i) => (
-                    <div key={i} className="text-[10px] text-[#86868b] bg-black/40 p-2 rounded-lg border border-white/[0.04]">
-                      <span className="font-semibold text-white/90">{c.doc_type}</span> • {c.page_or_time}
+                    <div key={i} className="text-[10px] text-[#86868b] bg-black/40 p-2 rounded-lg border border-white/[0.04] space-y-1">
+                      <div>
+                        <span className="font-semibold text-white/90">{c.doc_type}</span> • {c.page_or_time}
+                        {c.local_filename && <span className="ml-1 font-mono text-[#515156]">({c.local_filename})</span>}
+                      </div>
+                      {c.exact_quote && (
+                        <div className="italic text-[#a1a1a6]">"{c.exact_quote}"</div>
+                      )}
+                      {c.document_hash && (
+                        <div className="font-mono text-[9px] text-[#515156] break-all">SHA-256: {c.document_hash}</div>
+                      )}
                     </div>
                   ))}
                 </div>

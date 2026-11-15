@@ -19,6 +19,9 @@ logger = logging.getLogger(__name__)
 _CACHE: Dict[str, Dict[str, Any]] = {}
 CACHE_TTL_SECONDS = 300  # 5 minutes
 
+# Explicit reference date for cached/demo EOD benchmark snapshot (Q2 FY25 reporting close)
+FALLBACK_AS_OF_DATE = "2024-11-08"
+
 # Golden reference metrics for portfolio stocks (used for offline resilience & seeding SQLite)
 FALLBACK_METRICS: Dict[str, Dict[str, Any]] = {
     "RELIANCE.NS": {"price": 1284.50, "change_pct": 2.85, "volume": 18450000, "avg_vol": 8200000},
@@ -75,6 +78,8 @@ def seed_portfolio_cache_if_needed():
                 "avg_20d_volume": fb["avg_vol"],
                 "volume_multiplier": vol_mult,
                 "live": False,
+                "data_status": "cached_demo_snapshot",
+                "as_of_date": FALLBACK_AS_OF_DATE,
                 "valid": True,
             }
             upsert_market_cache(
@@ -84,7 +89,6 @@ def seed_portfolio_cache_if_needed():
                 cap=item.get("cap", "Mid/Large"),
                 metric=metric
             )
-            _CACHE[sym] = {"data": metric, "timestamp": time.time()}
     except Exception as e:
         logger.warning(f"Portfolio cache seeding warning: {e}")
 
@@ -93,19 +97,67 @@ def seed_portfolio_cache_if_needed():
 seed_portfolio_cache_if_needed()
 
 
-def fetch_ticker_eod(symbol: str) -> Dict[str, Any]:
+def _try_live_yfinance_eod(sym: str) -> Optional[Dict[str, Any]]:
+    """Attempts live EOD market data retrieval via yfinance. Returns None if unavailable."""
+    try:
+        ticker = yf.Ticker(sym)
+        hist = ticker.history(period="1mo")
+        if hist is not None and not hist.empty and len(hist) >= 2:
+            current_close = float(hist["Close"].iloc[-1])
+            prev_close = float(hist["Close"].iloc[-2])
+            if math.isnan(current_close) or math.isnan(prev_close) or prev_close <= 0:
+                return None
+            change_pct = round(((current_close - prev_close) / prev_close) * 100, 2)
+            today_volume = int(hist["Volume"].iloc[-1])
+            avg_20d_volume = int(hist["Volume"].tail(20).mean())
+            volume_multiplier = round(today_volume / max(avg_20d_volume, 1), 2)
+            bar_date = (
+                hist.index[-1].strftime("%Y-%m-%d")
+                if hasattr(hist.index[-1], "strftime")
+                else FALLBACK_AS_OF_DATE
+            )
+            return {
+                "symbol": sym,
+                "price": round(current_close, 2),
+                "change_pct": change_pct,
+                "volume": today_volume,
+                "avg_20d_volume": avg_20d_volume,
+                "volume_multiplier": volume_multiplier,
+                "live": True,
+                "data_status": "live_eod",
+                "as_of_date": bar_date,
+                "valid": True,
+            }
+    except Exception as e:
+        logger.warning(f"yfinance live EOD fetch failed for {sym}: {e}")
+    return None
+
+
+def fetch_ticker_eod(symbol: str, prefer_live: bool = True) -> Dict[str, Any]:
     """
     Fetch current price, 1-day change, and 20-day average volume for a symbol.
-    Strictly checks validity: returns valid=False for unknown or unresolvable tickers.
+    1. Returns fresh in-memory cache if available (and matches prefer_live or is already live).
+    2. When prefer_live=True, attempts live EOD via yfinance BEFORE falling back to cached demo snapshot.
+    3. If live fetch is unavailable and symbol is in FALLBACK_METRICS, returns explicit cached_demo_snapshot with as_of_date.
+    4. Returns valid=False for unknown or unresolvable tickers (never fabricates prices).
     """
     sym = sanitize_ticker(symbol)
     now = time.time()
 
     # 1. Check in-memory cache
     if sym in _CACHE and (now - _CACHE[sym]["timestamp"] < CACHE_TTL_SECONDS):
-        return _CACHE[sym]["data"]
+        cached_entry = _CACHE[sym]["data"]
+        if cached_entry.get("live", False) or not prefer_live or _CACHE[sym].get("live_attempted", False):
+            return cached_entry
 
-    # 2. Check if known portfolio ticker with cached metrics
+    # 2. Attempt live EOD via yfinance first when prefer_live is True
+    if prefer_live:
+        live_data = _try_live_yfinance_eod(sym)
+        if live_data is not None:
+            _CACHE[sym] = {"data": live_data, "timestamp": now, "live_attempted": True}
+            return live_data
+
+    # 3. Fallback to verified cached demo snapshot if known portfolio/ad-hoc ticker
     if sym in FALLBACK_METRICS:
         fb = FALLBACK_METRICS[sym]
         vol_mult = round(fb["volume"] / max(fb["avg_vol"], 1), 2)
@@ -117,39 +169,21 @@ def fetch_ticker_eod(symbol: str) -> Dict[str, Any]:
             "avg_20d_volume": fb["avg_vol"],
             "volume_multiplier": vol_mult,
             "live": False,
+            "data_status": "cached_demo_snapshot",
+            "as_of_date": FALLBACK_AS_OF_DATE,
             "valid": True,
         }
-        _CACHE[sym] = {"data": data, "timestamp": now}
+        _CACHE[sym] = {"data": data, "timestamp": now, "live_attempted": prefer_live}
         return data
 
-    # 3. For ad-hoc tickers, query yfinance with short timeout
-    try:
-        ticker = yf.Ticker(sym)
-        hist = ticker.history(period="1mo")
-        if not hist.empty and len(hist) >= 2:
-            current_close = float(hist["Close"].iloc[-1])
-            prev_close = float(hist["Close"].iloc[-2])
-            change_pct = round(((current_close - prev_close) / prev_close) * 100, 2)
-            today_volume = int(hist["Volume"].iloc[-1])
-            avg_20d_volume = int(hist["Volume"].tail(20).mean())
-            volume_multiplier = round(today_volume / max(avg_20d_volume, 1), 2)
+    # 4. If prefer_live was False for an ad-hoc ticker not in FALLBACK_METRICS, still try yfinance
+    if not prefer_live:
+        live_data = _try_live_yfinance_eod(sym)
+        if live_data is not None:
+            _CACHE[sym] = {"data": live_data, "timestamp": now, "live_attempted": True}
+            return live_data
 
-            data = {
-                "symbol": sym,
-                "price": round(current_close, 2),
-                "change_pct": change_pct,
-                "volume": today_volume,
-                "avg_20d_volume": avg_20d_volume,
-                "volume_multiplier": volume_multiplier,
-                "live": True,
-                "valid": True,
-            }
-            _CACHE[sym] = {"data": data, "timestamp": now}
-            return data
-    except Exception as e:
-        logger.warning(f"yfinance fetch failed for ad-hoc symbol {sym}: {e}")
-
-    # 4. Unknown ticker that failed resolution -> STRICTLY REFUSE FABRICATION
+    # 5. Unknown ticker that failed resolution -> STRICTLY REFUSE FABRICATION
     invalid_data = {
         "symbol": sym,
         "price": 0.0,
@@ -158,6 +192,8 @@ def fetch_ticker_eod(symbol: str) -> Dict[str, Any]:
         "avg_20d_volume": 0,
         "volume_multiplier": 0.0,
         "live": False,
+        "data_status": "unavailable",
+        "as_of_date": "",
         "valid": False,  # Explicitly mark invalid
     }
     return invalid_data
@@ -166,12 +202,15 @@ def fetch_ticker_eod(symbol: str) -> Dict[str, Any]:
 def scan_unusual_moves(
     tickers: Optional[List[Dict[str, Any]]] = None,
     volume_threshold: float = 2.0,
-    price_change_threshold: float = 3.0
+    price_change_threshold: float = 3.0,
+    prefer_live: bool = False
 ) -> List[UnusualMoveAlert]:
     """
     Evaluates End-of-Day data across portfolio and ad-hoc tickers to flag unusual moves:
     1. Volume > volume_threshold * 20-day average
     2. Absolute price change >= price_change_threshold (%)
+    Uses any live EOD entries already in _CACHE, or attempts live EOD when prefer_live=True.
+    Fallback entries are explicitly marked cached_demo_snapshot with as_of_date.
     """
     if not tickers:
         tickers = DEFAULT_PORTFOLIO
@@ -181,7 +220,7 @@ def scan_unusual_moves(
     for item in tickers:
         sym = item["symbol"]
         company_name = item.get("name", sym.replace(".NS", ""))
-        metric = fetch_ticker_eod(sym)
+        metric = fetch_ticker_eod(sym, prefer_live=prefer_live)
 
         if not metric.get("valid", True):
             continue
@@ -206,6 +245,15 @@ def scan_unusual_moves(
                 alert_type = "PRICE_PLUNGE"
                 reason = f"Sharp downward pressure: Stock slid {metric['change_pct']}% crossing the ±{price_change_threshold}% volatility threshold."
 
+            is_live_quote = bool(metric.get("live", False))
+            status_label = metric.get("data_status", "live_eod" if is_live_quote else "cached_demo_snapshot")
+            as_of_date = metric.get("as_of_date", FALLBACK_AS_OF_DATE)
+            ts_label = (
+                f"Live EOD ({as_of_date})"
+                if is_live_quote
+                else f"Cached Demo Snapshot (As of {as_of_date})"
+            )
+
             alert = UnusualMoveAlert(
                 id=f"alert-{sym.replace('.', '_')}-{int(time.time())}",
                 symbol=sym,
@@ -217,8 +265,11 @@ def scan_unusual_moves(
                 volume_multiplier=vol_mult,
                 alert_type=alert_type,
                 reasoning=reason,
-                timestamp="Today (EOD)",
-                hours_ago=0
+                timestamp=ts_label,
+                hours_ago=0,
+                is_live=is_live_quote,
+                data_status=status_label,
+                as_of_date=as_of_date
             )
             alerts.append(alert)
 

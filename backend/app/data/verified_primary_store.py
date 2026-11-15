@@ -10,14 +10,14 @@ VERIFIED_PRIMARY_STORE: Dict[str, Dict[str, Any]] = {
         "name": "Zomato Ltd (Eternal)",
         "sector": "Internet & Quick Commerce",
         "provenance_status": "indexed_primary",
-        "provenance_note": "Verified Primary Ingestion: Audited Q2 FY25 Results & Shareholder Letter (Oct 22, 2024). All claims verified against local primary PDF.",
+        "provenance_note": "Verified Primary Ingestion: Audited Q2 FY25 Results & Shareholder Letter (Oct 22, 2024). Indexed claims are verified against the local primary PDF.",
         "data_source": "verified_primary_store",
         "what_changed": {
             "event_title": "Blinkit Hyper-Scale to 2,000 Stores & Defensive ₹8,500 Cr Equity Defense",
             "what_changed": "Management revised its store expansion pace upwards (targeting 2,000 dark stores by FY26 end) and confirmed raising ₹8,500 Cr fresh equity capital via QIP to guard against aggressive competitor funding.",
             "prior_guidance_contradicted": "Earlier commentary anticipated reaching 1,000 stores with internal cash accruals and zero equity dilution.",
             "investor_impact": "Consolidated near-term margin inflection is muted as newly added dark stores take 90 days to achieve contribution break-even; balance sheet liquidity is fortified.",
-            "confidence_level": "High (100% Primary Grounding)",
+            "confidence_level": "High (Indexed Primary Grounding)",
             "filing_date": "October 22, 2024",
             "evidence": {
                 "doc_id": "BSE-543320-20241022-RESULTS",
@@ -129,11 +129,11 @@ VERIFIED_PRIMARY_STORE: Dict[str, Dict[str, Any]] = {
         "cash_quality": {
             "cfo_cr": 1120.0,
             "pat_cr": 176.0,
-            "cash_conversion_ratio": 1.72,
+            "cash_conversion_ratio": 6.36,
             "fcf_cr": 840.0,
             "capital_expenditure_cr": 280.0,
             "divergence_flag": False,
-            "commentary": "Organic cash generation confirmed in shareholder letter with positive operating cash flow and negative working capital cycle.",
+            "commentary": "Organic cash generation confirmed in shareholder letter with positive operating cash flow (CFO/PAT = 6.36x; FCF = CFO ₹1,120 Cr - Capex ₹280 Cr = ₹840 Cr) and negative working capital cycle.",
             "primary_citations": [
                 {
                     "doc_id": "ZOMATO-SHL-Q2FY25-P5B",
@@ -222,14 +222,14 @@ VERIFIED_PRIMARY_STORE: Dict[str, Dict[str, Any]] = {
         "name": "Tata Motors Ltd",
         "sector": "Automotive & Electric Mobility",
         "provenance_status": "indexed_primary",
-        "provenance_note": "Verified Primary Ingestion: Consolidated Q2 FY25 Results Press Release (Nov 8, 2024) + Earnings Call Transcript (Nov 8, 2024). All claims verified against local primary PDFs.",
+        "provenance_note": "Verified Primary Ingestion: Consolidated Q2 FY25 Results Press Release (Nov 8, 2024) + Earnings Call Transcript (Nov 8, 2024). Indexed claims are verified against local primary PDFs.",
         "data_source": "verified_primary_store",
         "what_changed": {
             "event_title": "Automotive FCF Turns Negative ₹2.9K Cr on Aluminum Supply Bottlenecks",
             "what_changed": "Q2 FY25 Automotive Free Cash Flow turned negative at ₹(2,900) Cr due to temporary aluminum supplier flooding in Europe holding up 6,029 JLR vehicles, alongside domestic CV volume slowdown.",
             "prior_guidance_contradicted": "Prior commentary expected consistent positive automotive free cash flow each quarter towards achieving net cash status.",
             "investor_impact": "H1 cash flow flat; management reaffirmed commitment to hit full-year EBIT margin of 8.5% and net cash target via H2 wholesale recovery.",
-            "confidence_level": "High (100% Primary Grounding)",
+            "confidence_level": "High (Indexed Primary Grounding)",
             "filing_date": "November 8, 2024",
             "evidence": {
                 "doc_id": "BSE-500570-20241108-RESULTS",
@@ -273,7 +273,7 @@ VERIFIED_PRIMARY_STORE: Dict[str, Dict[str, Any]] = {
             "revenue_cr": 101450.0,
             "ebitda_cr": 11600.0,
             "pat_cr": 3450.0,
-            "ebitda_margin": 11.4,
+            "ebitda_margin": 11.43,
             "pat_margin": 3.40,
             "roce": 21.4,
             "roe": 34.6,
@@ -341,11 +341,11 @@ VERIFIED_PRIMARY_STORE: Dict[str, Dict[str, Any]] = {
         "cash_quality": {
             "cfo_cr": 4200.0,
             "pat_cr": 3450.0,
-            "cash_conversion_ratio": 0.65,
+            "cash_conversion_ratio": 1.22,
             "fcf_cr": -2900.0,
             "capital_expenditure_cr": 7100.0,
             "divergence_flag": True,
-            "commentary": "Automotive free cash flow for Q2 FY25 was negative at ₹(2,900) Cr due to temporary aluminum supply constraints and British flood disruptions at JLR, alongside seasonal working capital unwinding.",
+            "commentary": "Automotive free cash flow for Q2 FY25 was negative at ₹(2,900) Cr (CFO ₹4,200 Cr - Capex ₹7,100 Cr; CFO/PAT = 1.22x) due to temporary aluminum supply constraints and British flood disruptions at JLR, alongside seasonal working capital unwinding.",
             "primary_citations": [
                 {
                     "doc_id": "TML-TR-Q2FY25-P3B",
@@ -434,14 +434,14 @@ VERIFIED_PRIMARY_STORE: Dict[str, Dict[str, Any]] = {
         "name": "Reliance Industries Ltd",
         "sector": "Energy, Retail & Digital",
         "provenance_status": "indexed_primary",
-        "provenance_note": "Verified Primary Ingestion: Consolidated Q2 FY25 Media Release (Oct 14, 2024) + Analyst Presentation (Oct 14, 2024). All claims verified against local primary PDFs.",
+        "provenance_note": "Verified Primary Ingestion: Consolidated Q2 FY25 Media Release (Oct 14, 2024) + Analyst Presentation (Oct 14, 2024). Indexed claims are verified against local primary PDFs.",
         "data_source": "verified_primary_store",
         "what_changed": {
             "event_title": "Jio ARPU Up 7.4% YoY to ₹195.1 Offsetting Global O2C Refining Softness",
             "what_changed": "Jio telecom ARPU rose to ₹195.1 (+7.4% YoY) as July 2024 tariff hikes began flowing through, generating record quarterly EBITDA of ₹15,931 Cr in Digital Services, counteracting a global 50% crack decline in O2C.",
             "prior_guidance_contradicted": "Earlier downstream expectations anticipated stable regional chemical margins.",
             "investor_impact": "Digital & upstream EBITDA growth mitigated downstream refining headwinds; full tariff impact to accrue over subsequent 2-3 quarters.",
-            "confidence_level": "High (100% Primary Grounding)",
+            "confidence_level": "High (Indexed Primary Grounding)",
             "filing_date": "October 14, 2024",
             "evidence": {
                 "doc_id": "BSE-500325-20241014-RESULTS",
@@ -553,11 +553,11 @@ VERIFIED_PRIMARY_STORE: Dict[str, Dict[str, Any]] = {
         "cash_quality": {
             "cfo_cr": 44800.0,
             "pat_cr": 19101.0,
-            "cash_conversion_ratio": 1.45,
+            "cash_conversion_ratio": 2.35,
             "fcf_cr": 14200.0,
             "capital_expenditure_cr": 30600.0,
             "divergence_flag": False,
-            "commentary": "Cash flow conversion remains robust across consumer business pillars, offsetting temporary refining margin compression in O2C.",
+            "commentary": "Cash flow conversion remains robust across consumer business pillars (CFO/PAT = 2.35x; FCF = CFO ₹44,800 Cr - Capex ₹30,600 Cr = ₹14,200 Cr), offsetting temporary refining margin compression in O2C.",
             "primary_citations": [
                 {
                     "doc_id": "RIL-PRES-Q2FY25-P7",

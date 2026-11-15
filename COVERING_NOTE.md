@@ -2,17 +2,19 @@
 **To:** assessment@enam.com
 **Subject:** IIT Delhi – AI Engineer - 2027
 
-- **Candidate:** _[YOUR NAME]_
-- **GitHub Repository:** _[REPO URL]_
-- **Deployed Mobile Demo:** _[DEPLOYED URL]_
-- **AI Build History & Logs:** _[LINKS TO AI SESSION LOGS / TRANSCRIPTS]_
+> [!WARNING]
+> **SUBMISSION BLOCKERS — REPLACE PLACEHOLDERS BELOW BEFORE SENDING TO `assessment@enam.com`:**
+> - **Candidate:** **[SUBMISSION BLOCKER: Insert Candidate Full Name & Contact]**
+> - **GitHub Repository:** **https://github.com/AlgoRubic/ENAM-ASSIGNMENT**
+> - **Deployed Mobile Demo:** **[SUBMISSION BLOCKER: Replace temporary URL with permanent deployed URL]** https://folder-sql-coral-certain.trycloudflare.com
+> - **AI Build History & Logs:** **[SUBMISSION BLOCKER: Insert Public Links to AI Session Logs / Transcripts]**
 
 ---
 
 ## Executive Summary
 FINN is an institutional mobile-first financial intelligence agent built for public-markets investors. It operates on two foundational rails:
 1. **Push Feed**: High-signal windowed announcements digest (filtering routine certificates/ESOPs and prioritizing material corporate actions) and unified alerts (monitoring daily price breaks, volume surges >2x 20D average, and material regulatory filings).
-2. **Pull Terminal**: On-demand primary research engine grounded strictly in verified quarterly results (Q2 FY25) and earnings concall transcripts for benchmark holdings (**ZOMATO.NS**, **TATAMOTORS.NS**, and **RELIANCE.NS**), with an evidence-first "What Changed?" card and one-tap source drawer.
+2. **Pull Terminal**: On-demand primary research engine grounded strictly in indexed Q2 FY25 exchange filings, earnings-call transcript (Tata Motors), and investor presentation (Reliance) for benchmark holdings (**ZOMATO.NS**, **TATAMOTORS.NS**, and **RELIANCE.NS**), with an evidence-first "What Changed?" card and one-tap source drawer.
 
 In strict adherence to the challenge brief, FINN enforces a **zero-fabrication data trust standard**:
 - Verified companies return primary-grounded modules with real filing IDs, page references, and SHA-256 document checksums.
@@ -25,15 +27,16 @@ In strict adherence to the challenge brief, FINN enforces a **zero-fabrication d
 
 | Feature / Module | Implementation & Verification Status |
 |---|---|
-| **Primary Document Store** | Audited Q2 FY25 results (quarter ended Sep 30, 2024) & concall transcripts for **ZOMATO.NS**, **TATAMOTORS.NS**, and **RELIANCE.NS**. Stored in `backend/app/data/verified_primary_store.py` with downloaded PDFs in `backend/app/data/documents/`. |
+| **Primary Document Store** | Indexed Q2 FY25 exchange filings (quarter ended Sep 30, 2024), earnings-call transcript (Tata Motors), and investor presentation (Reliance) for **ZOMATO.NS**, **TATAMOTORS.NS**, and **RELIANCE.NS**. Stored in `backend/app/data/verified_primary_store.py` with downloaded PDFs in `backend/app/data/documents/`. |
 | **Authentic Document Hashes** | Real SHA-256 checksums computed directly on downloaded official filings (e.g. Zomato `6e9351...`, Tata Motors `e8dc4c...`, Reliance `f78f4a...`). |
 | **"What Changed?" Card** | Evidence-first card in Pull Terminal highlighting the latest material corporate development, prior expectation contradicted, investor impact, and a one-tap primary evidence drawer. |
 | **Exchange Ingestion Feed** | Persistent SQLite `announcements_feed` table recording `filing_id`, `original_url`, `publication_timestamp`, `fetch_timestamp`, `document_hash`, and `extraction_status` (`VERIFIED_EXTRACTED`). Queryable via `/api/push/feed/db`. |
 | **Sub-15ms Page Load** | SQLite persistent cache (`finn.db`) pre-seeded with portfolio stocks, eliminating blocking sequential Yahoo Finance network requests. |
 | **Configurable Alert Engine** | Unified alert stream covering volume multipliers (1.0x–10.0x), price change bands (±0.5%–50.0%), and material exchange filings. Bounds validated on backend and persisted in SQLite. |
 | **Honest Refusal & 404** | Invalid symbols return clean HTTP 404. Unindexed NSE tickers return `market_data_only` without relabelling or disguising data. |
+| **Evidence Health Panel** | Reviewer-facing mobile card reachable from the top Header (`Evidence 18/18` pill) and Audit tab, powered by `GET /api/audit/summary`. Dynamically reports indexed ticker count/list, local PDF count, verified citation count, formula-audit status, market-data status/as-of, active feed mode, and explicit submission blockers with honest green/amber states and drill-down metrics. |
 | **Frontend UI/UX** | Apple-grade dark theme (OLED `#000000`, frosted glass, iOS segmented controls, smooth shimmer skeletons). 0 oxlint warnings, 0 build errors. Accessible modal dialogs with Escape key listeners. |
-| **Automated Test Suite** | 10 pytest tests covering known ticker provenance, unindexed refusal, 404 handling, copilot honest refusal, boundary validation, SQLite persistence, evidence SHA-256 hashes, unified alerts, SQLite exchange feed, and strict cryptographic PDF provenance with verbatim quote matching. |
+| **Automated Test Suite** | 15 pytest tests covering known ticker provenance, unindexed refusal, 404 handling, copilot honest refusal & cash-conversion routing, boundary validation, SQLite persistence, evidence SHA-256 hashes, unified alerts, SQLite exchange feed, ISO timestamp window filtering (excluding 2024 filings from live 24h windows), live-first vs cached/demo market data status & as-of dates, explicit numeric formula verification (`EBITDA/Revenue`, `PAT/Revenue`, `CFO/PAT`, `CFO-Capex`), strict cryptographic PDF provenance with verbatim quote matching, and `/api/audit/summary` live telemetry & drift detection. |
 
 ---
 
@@ -75,4 +78,4 @@ run.bat
 # 2. Comprehensive pytest suite (isolated DB, 0 mutations to committed database)
 ./venv/Scripts/pytest backend/tests/test_provenance_and_integrity.py -v
 ```
-All 10 test assertions pass with 100% success rate.
+All 15 automated tests pass (15/15).

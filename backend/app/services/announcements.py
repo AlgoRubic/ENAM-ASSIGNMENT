@@ -10,7 +10,8 @@ Announcements Engine for FINN:
 """
 import os
 import hashlib
-from typing import List, Dict, Optional, Any
+from datetime import datetime, timezone
+from typing import List, Dict, Optional, Any, Tuple
 from app.config import DEFAULT_PORTFOLIO, HIGH_SIGNAL_CATEGORIES
 from app.models.schemas import (
     AnnouncementItem,
@@ -24,12 +25,71 @@ from app.models.schemas import (
 
 DOCS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "documents")
 
+# Explicit historical reference anchor for the audited Q2 FY25 filing season
+HISTORICAL_Q2_FY25_AS_OF = "2024-11-08T23:59:59Z"
+
 def _calc_sha256(fname: str) -> Optional[str]:
     fpath = os.path.join(DOCS_DIR, fname)
     if os.path.isfile(fpath):
         with open(fpath, "rb") as f:
             return hashlib.sha256(f.read()).hexdigest()
     return None
+
+
+def parse_iso_timestamp(ts_str: Optional[str], fallback_filing_date: Optional[str] = None) -> datetime:
+    """
+    Parses an ISO-8601 publication_timestamp string or derives a UTC datetime from filing_date.
+    Never uses hand-entered relative hours.
+    """
+    if ts_str:
+        cleaned = ts_str.strip()
+        if cleaned.endswith("Z"):
+            cleaned = cleaned[:-1] + "+00:00"
+        try:
+            dt = datetime.fromisoformat(cleaned)
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            return dt.astimezone(timezone.utc)
+        except ValueError:
+            pass
+
+    if fallback_filing_date:
+        for fmt in ("%B %d, %Y", "%b %d, %Y", "%Y-%m-%d"):
+            try:
+                dt = datetime.strptime(fallback_filing_date.strip(), fmt)
+                return dt.replace(hour=15, minute=30, tzinfo=timezone.utc)
+            except ValueError:
+                continue
+
+    raise ValueError(f"Cannot parse timestamp '{ts_str}' or filing_date '{fallback_filing_date}'")
+
+
+def resolve_as_of_timestamp(as_of: Optional[str] = None) -> Tuple[datetime, str, str]:
+    """
+    Resolves the reference timestamp (`as_of`) for window comparisons:
+    - If `as_of` is None or 'now'/'live': uses current wall-clock UTC time (live_current_window).
+    - If `as_of` is 'historical_q2_fy25' / 'historical' / 'q2_fy25' or a 2024 ISO timestamp:
+      uses the parsed historical timestamp and labels feed_mode = 'historical_q2_fy25_demo'.
+    """
+    if not as_of or as_of.strip().lower() in ("now", "live", "current"):
+        now_dt = datetime.now(timezone.utc)
+        return now_dt, now_dt.strftime("%Y-%m-%dT%H:%M:%SZ"), "live_current_window"
+
+    normalized = as_of.strip().lower()
+    if normalized in ("historical_q2_fy25", "historical", "q2_fy25", "demo"):
+        hist_dt = parse_iso_timestamp(HISTORICAL_Q2_FY25_AS_OF)
+        return hist_dt, HISTORICAL_Q2_FY25_AS_OF, "historical_q2_fy25_demo"
+
+    parsed_dt = parse_iso_timestamp(as_of)
+    iso_str = parsed_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+    mode = "historical_q2_fy25_demo" if parsed_dt.year == 2024 else "custom_as_of_window"
+    return parsed_dt, iso_str, mode
+
+
+def compute_hours_between(as_of_dt: datetime, pub_dt: datetime) -> float:
+    """Returns exact elapsed hours between publication timestamp and as_of reference timestamp."""
+    return (as_of_dt - pub_dt).total_seconds() / 3600.0
+
 
 # Audited regulatory filings strictly anchored in committed PDF archives
 ANNOUNCEMENTS_DATA: List[Dict[str, Any]] = [
@@ -38,7 +98,7 @@ ANNOUNCEMENTS_DATA: List[Dict[str, Any]] = [
         "symbol": "ZOMATO.NS",
         "company_name": "Zomato Ltd (Eternal)",
         "filing_date": "October 22, 2024",
-        "timestamp_hours_ago": 3,
+        "publication_timestamp": "2024-10-22T15:30:00Z",
         "title": "Financial Results for the quarter ended September 30, 2024 (Q2 FY25) - Shareholder Letter",
         "category": "results",
         "priority": 1,
@@ -100,9 +160,9 @@ ANNOUNCEMENTS_DATA: List[Dict[str, Any]] = [
         "symbol": "ZOMATO.NS",
         "company_name": "Zomato Ltd (Eternal)",
         "filing_date": "October 22, 2024",
-        "timestamp_hours_ago": 5,
+        "publication_timestamp": "2024-10-22T16:00:00Z",
         "title": "Outcome of Board Meeting: Approval of Fund Raising up to ₹8,500 Crore via QIP",
-        "category": "capex",
+        "category": "fund_raise",
         "priority": 1,
         "is_material": True,
         "summary_one_liner": "Board sanctioned ₹8,500 Cr equity capital raise via QIP to bolster balance sheet strength against quick-commerce competition.",
@@ -127,7 +187,7 @@ ANNOUNCEMENTS_DATA: List[Dict[str, Any]] = [
         "symbol": "TATAMOTORS.NS",
         "company_name": "Tata Motors Ltd",
         "filing_date": "November 8, 2024",
-        "timestamp_hours_ago": 6,
+        "publication_timestamp": "2024-11-08T15:45:00Z",
         "title": "Financial Results for the Quarter Ended September 30, 2024 (Q2 FY25) - Press Release",
         "category": "results",
         "priority": 1,
@@ -167,8 +227,8 @@ ANNOUNCEMENTS_DATA: List[Dict[str, Any]] = [
                 "delta_qoq_pct": -39.9,
                 "delta_yoy_pct": -11.2
             },
-            "ebitda_margin_pct": 11.4,
-            "pat_margin_pct": 3.3,
+            "ebitda_margin_pct": 11.41,
+            "pat_margin_pct": 3.30,
             "key_takeaway": "JLR wholesale volumes temporarily constrained by supplier aluminum flood; automotive free cash flow stood at negative ₹(2,900) Cr.",
             "evidence": {
                 "doc_id": "BSE-500570-20241108-RESULTS",
@@ -189,7 +249,7 @@ ANNOUNCEMENTS_DATA: List[Dict[str, Any]] = [
         "symbol": "TATAMOTORS.NS",
         "company_name": "Tata Motors Ltd",
         "filing_date": "November 8, 2024",
-        "timestamp_hours_ago": 7,
+        "publication_timestamp": "2024-11-08T16:15:00Z",
         "title": "Composite Scheme of Arrangement for Demerger of CV and PV Businesses",
         "category": "M&A",
         "priority": 1,
@@ -216,9 +276,9 @@ ANNOUNCEMENTS_DATA: List[Dict[str, Any]] = [
         "symbol": "TATAMOTORS.NS",
         "company_name": "Tata Motors Ltd",
         "filing_date": "November 8, 2024",
-        "timestamp_hours_ago": 8,
+        "publication_timestamp": "2024-11-08T19:30:00Z",
         "title": "Earnings Call Transcript for Q2 FY25 Ended September 30, 2024",
-        "category": "investor_meetings",
+        "category": "earnings_call",
         "priority": 2,
         "is_material": True,
         "summary_one_liner": "Management reiterated FY25 EBIT guidance of ≥8.5% for JLR with strong H2 order book recovery expected.",
@@ -243,7 +303,7 @@ ANNOUNCEMENTS_DATA: List[Dict[str, Any]] = [
         "symbol": "RELIANCE.NS",
         "company_name": "Reliance Industries",
         "filing_date": "October 14, 2024",
-        "timestamp_hours_ago": 22,
+        "publication_timestamp": "2024-10-14T19:15:00Z",
         "title": "Consolidated Financial Results for the Quarter ended September 30, 2024 (Q2 FY25)",
         "category": "results",
         "priority": 1,
@@ -305,7 +365,7 @@ ANNOUNCEMENTS_DATA: List[Dict[str, Any]] = [
         "symbol": "RELIANCE.NS",
         "company_name": "Reliance Industries",
         "filing_date": "October 14, 2024",
-        "timestamp_hours_ago": 23,
+        "publication_timestamp": "2024-10-14T20:00:00Z",
         "title": "Investor Presentation - Q2 FY25 Operational & Strategic Update",
         "category": "investor_meetings",
         "priority": 2,
@@ -332,7 +392,7 @@ ANNOUNCEMENTS_DATA: List[Dict[str, Any]] = [
         "symbol": "ZOMATO.NS",
         "company_name": "Zomato Ltd (Eternal)",
         "filing_date": "October 8, 2024",
-        "timestamp_hours_ago": 36,
+        "publication_timestamp": "2024-10-08T14:00:00Z",
         "title": "Compliance Certificate under Regulation 74(5) of SEBI (Depositories and Participants) Regulations",
         "category": "unclassified",
         "priority": 6,
@@ -347,7 +407,7 @@ ANNOUNCEMENTS_DATA: List[Dict[str, Any]] = [
         "symbol": "RELIANCE.NS",
         "company_name": "Reliance Industries",
         "filing_date": "October 14, 2024",
-        "timestamp_hours_ago": 40,
+        "publication_timestamp": "2024-10-14T10:30:00Z",
         "title": "Intimation of Schedule of Institutional Investor Interaction under Regulation 30",
         "category": "investor_meetings",
         "priority": 5,
@@ -360,27 +420,32 @@ ANNOUNCEMENTS_DATA: List[Dict[str, Any]] = [
 ]
 
 
-def format_relative_time(hours_ago: int, filing_date: Optional[str] = None) -> str:
-    if filing_date:
-        return filing_date
-    return f"{hours_ago}h into filing window"
-
-
 def get_windowed_digest(
-    window_hours: int = 720,
+    window_hours: int = 24,
     high_signal_only: bool = False,
-    selected_symbols: Optional[List[str]] = None
+    selected_symbols: Optional[List[str]] = None,
+    as_of: Optional[str] = None
 ) -> Dict[str, Any]:
     """
-    Returns windowed announcements across portfolio filtered by timeframe and priority.
-    Grounded in audited Q2 FY25 filing window documents.
+    Returns windowed announcements across portfolio filtered mathematically by comparing
+    parsed ISO publication_timestamp values against an `as_of` reference timestamp.
+    - When `as_of` is None: compares against current wall-clock UTC time (live_current_window).
+      Historical 2024 filings are excluded from current 24h/48h windows.
+    - When `as_of` is an explicit historical timestamp (e.g. '2024-11-08T23:59:59Z' or 'historical_q2_fy25'):
+      includes only filings published within [as_of - window_hours, as_of].
     """
+    as_of_dt, as_of_iso, feed_mode = resolve_as_of_timestamp(as_of)
     high_signal_list: List[AnnouncementItem] = []
     routine_list: List[AnnouncementItem] = []
 
     for item in ANNOUNCEMENTS_DATA:
-        # Time window check (default 720 covers full Q2 FY25 earnings season)
-        if item["timestamp_hours_ago"] > window_hours:
+        pub_iso = item.get("publication_timestamp")
+        filing_date_str = item.get("filing_date", "October 2024")
+        pub_dt = parse_iso_timestamp(pub_iso, filing_date_str)
+        delta_hours = compute_hours_between(as_of_dt, pub_dt)
+
+        # Mathematical window check: must be published on or before as_of_dt and within window_hours
+        if delta_hours < 0 or delta_hours > float(window_hours):
             continue
 
         # Symbol filter check (if specific company requested)
@@ -392,6 +457,11 @@ def get_windowed_digest(
         if "results_breakdown" in item:
             rb = item["results_breakdown"]
             ev = EvidenceDrawerItem(**rb["evidence"]) if "evidence" in rb and rb["evidence"] else None
+            rev_cur = float(rb["revenue"]["current"])
+            ebitda_cur = float(rb["ebitda"]["current"])
+            pat_cur = float(rb["pat"]["current"])
+            ebitda_m = round((ebitda_cur / rev_cur) * 100.0, 2) if rev_cur else rb["ebitda_margin_pct"]
+            pat_m = round((pat_cur / rev_cur) * 100.0, 2) if rev_cur else rb["pat_margin_pct"]
             res_breakdown = ResultsBreakdown(
                 period=rb["period"],
                 unit=rb["unit"],
@@ -399,8 +469,10 @@ def get_windowed_digest(
                 ebitda=FinancialDelta(**rb["ebitda"]),
                 pbt=FinancialDelta(**rb["pbt"]),
                 pat=FinancialDelta(**rb["pat"]),
-                ebitda_margin_pct=rb["ebitda_margin_pct"],
-                pat_margin_pct=rb["pat_margin_pct"],
+                ebitda_margin_pct=ebitda_m,
+                pat_margin_pct=pat_m,
+                ebitda_margin_formula=f"(EBITDA / Revenue) = (₹{ebitda_cur:,.0f} Cr / ₹{rev_cur:,.0f} Cr) = {ebitda_m}%",
+                pat_margin_formula=f"(PAT / Revenue) = (₹{pat_cur:,.0f} Cr / ₹{rev_cur:,.0f} Cr) = {pat_m}%",
                 key_takeaway=rb["key_takeaway"],
                 evidence=ev
             )
@@ -410,13 +482,17 @@ def get_windowed_digest(
         if "executive_bio" in item:
             exec_bio = ExecutiveBio(**item["executive_bio"])
 
+        computed_hours_ago = max(0, int(round(delta_hours)))
+        pub_ts_str = pub_iso or pub_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+
         ann_obj = AnnouncementItem(
             id=item["id"],
             symbol=item["symbol"],
             company_name=item["company_name"],
-            filing_date=item.get("filing_date", "October 2024"),
-            timestamp=item.get("filing_date", "October 2024"),
-            hours_ago=item["timestamp_hours_ago"],
+            filing_date=filing_date_str,
+            publication_timestamp=pub_ts_str,
+            timestamp=f"{filing_date_str} ({pub_ts_str})",
+            hours_ago=computed_hours_ago,
             title=item["title"],
             category=item["category"],
             priority=item["priority"],
@@ -434,11 +510,13 @@ def get_windowed_digest(
         else:
             routine_list.append(ann_obj)
 
-    # Sort high signal by priority first, then recency
+    # Sort high signal by priority first, then recency (smallest hours_ago first)
     high_signal_list.sort(key=lambda x: (x.priority, x.hours_ago))
 
     return {
         "window_hours": window_hours,
+        "feed_mode": feed_mode,
+        "as_of_timestamp": as_of_iso,
         "total_announcements": len(high_signal_list) + len(routine_list),
         "material_count": len(high_signal_list),
         "collapsed_routine_count": len(routine_list),
@@ -448,7 +526,6 @@ def get_windowed_digest(
 
 
 from app.db.storage import record_announcement_feed
-from datetime import datetime
 
 
 def sync_announcements_to_db():
@@ -457,7 +534,7 @@ def sync_announcements_to_db():
     Cryptographically verifies hashes against disk before assigning VERIFIED_EXTRACTED status.
     """
     try:
-        now_str = datetime.utcnow().isoformat() + "Z"
+        now_str = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         for item in ANNOUNCEMENTS_DATA:
             local_fn = item.get("local_filename")
             calc_hash = _calc_sha256(local_fn) if local_fn else None
@@ -472,6 +549,9 @@ def sync_announcements_to_db():
                 status = "UNVERIFIED_FIXTURE"
                 doc_hash = None
 
+            pub_dt = parse_iso_timestamp(item.get("publication_timestamp"), item.get("filing_date"))
+            pub_iso = item.get("publication_timestamp") or pub_dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+
             record_announcement_feed(
                 filing_id=item["id"],
                 symbol=item["symbol"],
@@ -480,7 +560,7 @@ def sync_announcements_to_db():
                 title=item["title"],
                 summary=item["summary_one_liner"],
                 original_url=item.get("source_url", ""),
-                publication_timestamp=item.get("filing_date", "October 2024"),
+                publication_timestamp=pub_iso,
                 fetch_timestamp=now_str,
                 document_hash=doc_hash or "",
                 extraction_status=status,

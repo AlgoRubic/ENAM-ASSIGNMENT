@@ -47,7 +47,14 @@ export default function PullTerminal({
     return (
       <div className="pb-24 smooth-fade-in space-y-3">
         <div className="rounded-2xl bg-[#1c1c1e] border border-white/[0.08] p-5">
-          <div className="text-[13px] uppercase tracking-wide text-[#86868b]">{analysis.symbol}</div>
+          <div className="flex items-center justify-between">
+            <div className="text-[13px] uppercase tracking-wide text-[#86868b]">{analysis.symbol}</div>
+            <span className="text-[10px] font-mono text-[#86868b] bg-white/[0.06] border border-white/[0.08] px-2 py-0.5 rounded-md">
+              {analysis.market_data_status === 'live_eod'
+                ? `Live EOD (${analysis.market_as_of_date})`
+                : `Cached Demo Snapshot (As of ${analysis.market_as_of_date || '2024-11-08'})`}
+            </span>
+          </div>
           <div className="text-[20px] font-semibold text-white">{analysis.company_name}</div>
           <div className="mt-2 text-[24px] font-semibold text-white tabular-numbers">
             ₹{analysis.last_price?.toLocaleString('en-IN')}
@@ -187,6 +194,11 @@ export default function PullTerminal({
             }`}>
               {isPositive ? '+' : ''}{analysis.day_change_pct}%
             </div>
+            <div className="mt-1 text-[10px] font-mono text-[#86868b]">
+              {analysis.market_data_status === 'live_eod'
+                ? `Live EOD (${analysis.market_as_of_date})`
+                : `Cached Demo Snapshot (As of ${analysis.market_as_of_date || '2024-11-08'})`}
+            </div>
           </div>
         </div>
 
@@ -194,7 +206,7 @@ export default function PullTerminal({
         <div className="flex items-center justify-between pt-3 border-t border-white/[0.06] text-[11px] text-[#86868b]">
           <div className="flex items-center gap-1.5 text-white/90 font-medium">
             <ShieldCheck className="w-3.5 h-3.5 text-[#30d158]" />
-            <span>Primary Sources: Audited Annual Report + Concall Transcripts</span>
+            <span>Primary Sources: Indexed Q2 FY25 Filings, Transcript & Presentation</span>
           </div>
           <span className="text-[#515156] font-mono">Zero Broker Slop</span>
         </div>
@@ -216,7 +228,7 @@ export default function PullTerminal({
           </div>
           <p className="text-xs text-[#a1a1a6] leading-relaxed">
             Credibility Score: <span className="font-bold text-white">{analysis.narrative_audit?.credibility_score}/100</span>. 
-            Audited 4 quarters of management promises vs delivered results.
+            Audited Q2 FY25 management promises vs delivered results.
           </p>
         </div>
         <ArrowRight className="w-4 h-4 text-[#86868b] group-hover:text-white group-hover:translate-x-0.5 transition-all flex-shrink-0" />
@@ -329,12 +341,20 @@ export default function PullTerminal({
                 <div className="text-[16px] font-semibold text-white tabular-numbers mt-0.5">
                   ₹{analysis.financial_snapshot.ebitda_cr?.toLocaleString('en-IN')} Cr
                 </div>
+                <div className="text-[10px] text-[#86868b] font-mono mt-1">
+                  {analysis.financial_snapshot.ebitda_margin_formula || `EBITDA / Revenue = ${analysis.financial_snapshot.ebitda_margin}%`}
+                </div>
               </div>
 
               <div className="p-3 rounded-xl bg-black/40 border border-white/[0.04]">
-                <div className="text-[10px] uppercase text-[#86868b] font-medium">PAT (Net Profit)</div>
+                <div className="text-[10px] uppercase text-[#86868b] font-medium">
+                  PAT ({analysis.financial_snapshot.pat_margin}%)
+                </div>
                 <div className="text-[16px] font-semibold text-[#30d158] tabular-numbers mt-0.5">
                   ₹{analysis.financial_snapshot.pat_cr?.toLocaleString('en-IN')} Cr
+                </div>
+                <div className="text-[10px] text-[#86868b] font-mono mt-1">
+                  {analysis.financial_snapshot.pat_margin_formula || `PAT / Revenue = ${analysis.financial_snapshot.pat_margin}%`}
                 </div>
               </div>
 
@@ -506,11 +526,17 @@ export default function PullTerminal({
                 <div className="text-[16px] font-semibold text-[#30d158] tabular-numbers mt-0.5">
                   {analysis.cash_quality.cash_conversion_ratio}x
                 </div>
+                <div className="text-[10px] text-[#86868b] font-mono mt-1">
+                  {analysis.cash_quality.cash_conversion_formula || `CFO / PAT = ₹${analysis.cash_quality.cfo_cr} Cr / ₹${analysis.cash_quality.pat_cr} Cr`}
+                </div>
               </div>
               <div className="p-3 rounded-xl bg-black/40 border border-white/[0.04]">
-                <div className="text-[10px] uppercase text-[#86868b]">Free Cash Flow (FCF)</div>
+                <div className="text-[10px] uppercase text-[#86868b]">Free Cash Flow (FCF = CFO - Capex)</div>
                 <div className="text-[16px] font-semibold text-white tabular-numbers mt-0.5">
                   ₹{analysis.cash_quality.fcf_cr?.toLocaleString('en-IN')} Cr
+                </div>
+                <div className="text-[10px] text-[#86868b] font-mono mt-1">
+                  {analysis.cash_quality.fcf_formula || `CFO - Capex = ₹${analysis.cash_quality.cfo_cr} Cr - ₹${analysis.cash_quality.capital_expenditure_cr} Cr`}
                 </div>
               </div>
               <div className="p-3 rounded-xl bg-black/40 border border-white/[0.04]">
@@ -565,7 +591,7 @@ export default function PullTerminal({
             {analysis.guidance.primary_citations?.[0] && (
               <div className="p-3 rounded-xl bg-black/40 border border-white/[0.06] text-[11px] text-[#86868b] space-y-1">
                 <div className="font-semibold text-white/90">
-                  Concall Transcript Audio Citation: {analysis.guidance.primary_citations[0].doc_type}
+                  Primary Source Citation: {analysis.guidance.primary_citations[0].doc_type}
                 </div>
                 <div className="italic text-[#a1a1a6]">
                   "{analysis.guidance.primary_citations[0].exact_quote}"

@@ -4,8 +4,19 @@ import { Search, SlidersHorizontal } from 'lucide-react';
 export default function Header({ 
   alertCount, 
   onOpenSettings, 
-  onOpenSearch
+  onOpenSearch,
+  auditSummary,
+  isEvidenceHealthOpen,
+  onToggleEvidenceHealth
 }) {
+  const overallStatus = auditSummary?.overall_status || 'amber';
+  const dotColor =
+    overallStatus === 'green'
+      ? 'bg-[#30d158]'
+      : overallStatus === 'red'
+      ? 'bg-[#ff453a]'
+      : 'bg-[#ff9f0a]';
+
   return (
     <header className="sticky top-0 z-40 bg-black/80 backdrop-blur-2xl border-b border-white/[0.06] px-4 py-2.5">
       <div className="max-w-md mx-auto flex items-center justify-between">
@@ -27,11 +38,25 @@ export default function Header({
 
         {/* Minimalist Controls */}
         <div className="flex items-center gap-2">
-          {/* Market Status indicator */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.06] text-[11px] text-[#86868b]" title="Grounded in audited Q2 FY25 regulatory filings & EOD snapshot">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#30d158]"></span>
-            <span className="font-medium text-[#86868b]">Q2 FY25 Audit</span>
-          </div>
+          {/* Interactive Evidence Health Toggle Pill */}
+          <button
+            onClick={onToggleEvidenceHealth}
+            aria-expanded={Boolean(isEvidenceHealthOpen)}
+            aria-label="Toggle Evidence Health Panel"
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] transition-all active:scale-95 ${
+              isEvidenceHealthOpen
+                ? 'bg-white text-black border-white font-semibold'
+                : 'bg-white/[0.04] hover:bg-white/[0.1] border-white/[0.08] text-[#d1d1d6]'
+            }`}
+            title="Open Evidence Health & Provenance Audit Summary (/api/audit/summary)"
+          >
+            <span className={`w-1.5 h-1.5 rounded-full ${dotColor}`}></span>
+            <span className="font-medium">
+              {auditSummary && !auditSummary.error
+                ? `Evidence ${auditSummary.verified_citation_count}/${auditSummary.total_citation_count}`
+                : 'Evidence Health'}
+            </span>
+          </button>
 
           {/* Quick Search */}
           <button

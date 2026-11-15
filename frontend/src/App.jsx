@@ -7,13 +7,15 @@ import NarrativeAuditView from './components/NarrativeAuditView';
 import CopilotChat from './components/CopilotChat';
 import CompanySearchModal from './components/CompanySearchModal';
 import AlertSettingsModal from './components/AlertSettingsModal';
+import EvidenceHealthPanel from './components/EvidenceHealthPanel';
 import { 
   fetchPortfolio, 
   fetchDigest, 
   fetchAlerts, 
   fetchCompanyAnalysis,
   fetchThresholds,
-  saveThresholds
+  saveThresholds,
+  fetchAuditSummary
 } from './services/api';
 
 export default function App() {
@@ -25,7 +27,8 @@ export default function App() {
   // Push Feed state
   const [digest, setDigest] = useState(null);
   const [alerts, setAlerts] = useState([]);
-  const [windowHours, setWindowHours] = useState(24);
+  const [windowHours, setWindowHours] = useState(720);
+  const [asOfTimestamp, setAsOfTimestamp] = useState('2024-11-08T23:59:59Z');
   const [highSignalOnly, setHighSignalOnly] = useState(false);
   const [volumeThreshold, setVolumeThreshold] = useState(2.0);
   const [priceThreshold, setPriceThreshold] = useState(3.0);
@@ -35,9 +38,21 @@ export default function App() {
   const [analysis, setAnalysis] = useState(null);
   const [loadingAnalysis, setLoadingAnalysis] = useState(false);
 
+  // Evidence Health & Provenance Audit Summary state
+  const [auditSummary, setAuditSummary] = useState(null);
+  const [loadingAuditSummary, setLoadingAuditSummary] = useState(false);
+  const [isEvidenceHealthOpen, setIsEvidenceHealthOpen] = useState(false);
+
   // Modals state
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  const handleRefreshAuditSummary = async () => {
+    setLoadingAuditSummary(true);
+    const summaryData = await fetchAuditSummary(asOfTimestamp);
+    setAuditSummary(summaryData);
+    setLoadingAuditSummary(false);
+  };
 
   // Load Initial Portfolio and Persisted Thresholds from SQLite
   useEffect(() => {
@@ -56,13 +71,24 @@ export default function App() {
     loadInitial();
   }, []);
 
-  // Re-fetch Digest and Alerts whenever windowHours, highSignalOnly, or thresholds change
+  // Refresh Evidence Health summary whenever feed reference timestamp changes
+  useEffect(() => {
+    async function syncAuditSummary() {
+      setLoadingAuditSummary(true);
+      const summaryData = await fetchAuditSummary(asOfTimestamp);
+      setAuditSummary(summaryData);
+      setLoadingAuditSummary(false);
+    }
+    syncAuditSummary();
+  }, [asOfTimestamp]);
+
+  // Re-fetch Digest and Alerts whenever windowHours, asOfTimestamp, highSignalOnly, or thresholds change
   useEffect(() => {
     async function syncFeedAndAlerts() {
       setLoadingDigest(true);
       const [dData, aData] = await Promise.all([
-        fetchDigest(windowHours, highSignalOnly),
-        fetchAlerts(volumeThreshold, priceThreshold, windowHours)
+        fetchDigest(windowHours, highSignalOnly, null, asOfTimestamp),
+        fetchAlerts(volumeThreshold, priceThreshold, windowHours, asOfTimestamp)
       ]);
       setDigest(dData);
       setAlerts(aData.alerts || []);
@@ -70,7 +96,7 @@ export default function App() {
       setTimeout(() => setLoadingDigest(false), 240);
     }
     syncFeedAndAlerts();
-  }, [windowHours, highSignalOnly, volumeThreshold, priceThreshold]);
+  }, [windowHours, asOfTimestamp, highSignalOnly, volumeThreshold, priceThreshold]);
 
   // Load Analysis when selectedSymbol changes
   useEffect(() => {
@@ -88,7 +114,7 @@ export default function App() {
   const handleApplyThresholds = async (newVol, newPrice) => {
     setLoadingDigest(true);
     await saveThresholds(newVol, newPrice);
-    const aData = await fetchAlerts(newVol, newPrice, windowHours);
+    const aData = await fetchAlerts(newVol, newPrice, windowHours, asOfTimestamp);
     setAlerts(aData.alerts || []);
     setTimeout(() => setLoadingDigest(false), 200);
   };
@@ -112,19 +138,35 @@ export default function App() {
         alertCount={alerts.length}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onOpenSearch={() => setIsSearchOpen(true)}
+        auditSummary={auditSummary}
+        isEvidenceHealthOpen={isEvidenceHealthOpen}
+        onToggleEvidenceHealth={() => setIsEvidenceHealthOpen((prev) => !prev)}
         activeTab={activeTab}
         selectedSymbol={selectedSymbol}
         portfolio={portfolio}
       />
 
       {/* Main Responsive View Container (Optimized for Mobile Phone Aspect Ratio) */}
-      <main className="flex-1 max-w-md w-full mx-auto px-3.5 pt-3">
+      <main className="flex-1 max-w-md w-full mx-auto px-3.5 pt-3 space-y-3">
+        {isEvidenceHealthOpen && activeTab !== 'audit' && (
+          <EvidenceHealthPanel
+            auditSummary={auditSummary}
+            isLoading={loadingAuditSummary}
+            onRefresh={handleRefreshAuditSummary}
+            onSelectSymbol={handleSelectSymbol}
+            onClose={() => setIsEvidenceHealthOpen(false)}
+            defaultExpanded={true}
+          />
+        )}
+
         {activeTab === 'push' && (
           <PushFeed
             digest={digest}
             alerts={alerts}
             windowHours={windowHours}
             setWindowHours={setWindowHours}
+            asOfTimestamp={asOfTimestamp}
+            setAsOfTimestamp={setAsOfTimestamp}
             highSignalOnly={highSignalOnly}
             setHighSignalOnly={setHighSignalOnly}
             onSelectSymbol={handleSelectSymbol}
@@ -151,6 +193,9 @@ export default function App() {
             onSelectSymbol={handleSelectSymbol}
             portfolio={portfolio}
             isLoading={loadingAnalysis}
+            auditSummary={auditSummary}
+            loadingAuditSummary={loadingAuditSummary}
+            onRefreshAuditSummary={handleRefreshAuditSummary}
           />
         )}
 
