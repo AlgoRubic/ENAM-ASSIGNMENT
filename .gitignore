@@ -20,3 +20,5 @@ dist/
 Thumbs.db
 
 .vercel
+*.egg-info/
+uv.lock
