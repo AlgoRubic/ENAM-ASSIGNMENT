@@ -9,17 +9,20 @@ from pydantic import BaseModel, Field
 
 class PrimarySourceCitation(BaseModel):
     doc_id: str = "DOC-PRIMARY-REF"
-    doc_type: str  # "Annual Report FY24", "Concall Transcript Q2 FY25", "BSE Results Filing"
+    doc_type: str  # e.g., "Shareholder Letter & Results (Q2 FY25)", "Press Release (Q2 FY25)"
     filing_id: Optional[str] = None
+    local_filename: Optional[str] = None
     period: str = "Q2 FY25"
     filing_date: str = "October 2024"
-    page_or_time: str = "Filing Table / Transcript"
-    exact_quote: str
-    document_hash: str = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"  # SHA-256 checksum of source document
+    page_or_time: str = "Page 1"
+    exact_quote: Optional[str] = None
+    derived_summary: Optional[str] = None
+    document_hash: str
     source_url: Optional[str] = None
 
 class EvidenceDrawerItem(BaseModel):
     doc_id: str
+    local_filename: Optional[str] = None
     title: str
     filing_date: str
     period: str

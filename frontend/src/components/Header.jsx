@@ -28,9 +28,9 @@ export default function Header({
         {/* Minimalist Controls */}
         <div className="flex items-center gap-2">
           {/* Market Status indicator */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.06] text-[11px] text-[#86868b]">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.06] text-[11px] text-[#86868b]" title="Grounded in audited Q2 FY25 regulatory filings & EOD snapshot">
             <span className="w-1.5 h-1.5 rounded-full bg-[#30d158]"></span>
-            <span className="font-medium text-[#86868b]">NSE</span>
+            <span className="font-medium text-[#86868b]">Q2 FY25 Audit</span>
           </div>
 
           {/* Quick Search */}

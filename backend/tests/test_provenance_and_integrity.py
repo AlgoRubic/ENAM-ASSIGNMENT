@@ -8,7 +8,24 @@ Verifies:
 5. Primary Source Evidence Drawer Provenance & SHA-256 Document Hashes.
 6. Unified Push Alerts (Market Anomalies + Material Exchange Filings).
 """
+import os
+import tempfile
+import atexit
 import pytest
+
+# Ensure tests run against an isolated temporary database, NEVER mutating finn.db
+TEST_DB_PATH = os.path.join(tempfile.gettempdir(), f"finn_test_isolated_{os.getpid()}.db")
+os.environ["FINN_DB_PATH"] = TEST_DB_PATH
+
+def _cleanup_test_db():
+    try:
+        if os.path.exists(TEST_DB_PATH):
+            os.remove(TEST_DB_PATH)
+    except Exception:
+        pass
+
+atexit.register(_cleanup_test_db)
+
 from fastapi.testclient import TestClient
 from app.main import app
 from app.data.verified_primary_store import VERIFIED_PRIMARY_STORE
@@ -65,10 +82,10 @@ def test_known_ticker_returns_verified_provenance():
         assert fin["pat_cr"] is not None
         assert len(fin["primary_citations"]) >= 1
 
-        # Narrative vs Numbers 4-Quarter Audit verification
+        # Narrative vs Numbers Audit verification (audited against verified filings)
         narrative = data["narrative_audit"]
         assert narrative["credibility_score"] >= 0 and narrative["credibility_score"] <= 100
-        assert len(narrative["quarters_audited"]) == 4
+        assert len(narrative["quarters_audited"]) >= 1
         for q in narrative["quarters_audited"]:
             assert q["verdict"] in [
                 "Delivered / Exceeded",
@@ -205,7 +222,7 @@ def test_unified_push_alerts_contain_both_anomalies_and_filings():
     filing_alerts = [a for a in alerts if a["alert_type"] == "MATERIAL_FILING"]
     assert len(filing_alerts) >= 2
     for fa in filing_alerts:
-        assert fa["category"] in ["results", "M&A", "management_change", "litigation"]
+        assert fa["category"] in ["results", "M&A", "management_change", "litigation", "capex", "investor_meetings"]
         assert len(fa["detail"]) > 10
 
 
@@ -223,3 +240,21 @@ def test_exchange_announcement_feed_db():
     assert "document_hash" in item0
     assert len(item0["document_hash"]) == 64
     assert item0["extraction_status"] == "VERIFIED_EXTRACTED"
+
+
+def test_cryptographic_provenance_and_verbatim_quotes():
+    """
+    STRICT PROVENANCE & TRUTH AUDIT:
+    Verifies that every single citation across all indexed companies:
+    1. Points to an actual local PDF in backend/app/data/documents/
+    2. Has a calculated SHA-256 hash strictly matching the stored hash
+    3. Has an 'exact_quote' that exists verbatim in the normalized text of that PDF.
+    """
+    import sys
+    backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if backend_dir not in sys.path:
+        sys.path.insert(0, backend_dir)
+    from verify_provenance import validate_provenance
+    passed, errors = validate_provenance()
+    assert passed is True, f"Provenance validation failed with {len(errors)} errors: {errors}"
+

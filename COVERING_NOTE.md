@@ -33,7 +33,7 @@ In strict adherence to the challenge brief, FINN enforces a **zero-fabrication d
 | **Configurable Alert Engine** | Unified alert stream covering volume multipliers (1.0x–10.0x), price change bands (±0.5%–50.0%), and material exchange filings. Bounds validated on backend and persisted in SQLite. |
 | **Honest Refusal & 404** | Invalid symbols return clean HTTP 404. Unindexed NSE tickers return `market_data_only` without relabelling or disguising data. |
 | **Frontend UI/UX** | Apple-grade dark theme (OLED `#000000`, frosted glass, iOS segmented controls, smooth shimmer skeletons). 0 oxlint warnings, 0 build errors. Accessible modal dialogs with Escape key listeners. |
-| **Automated Test Suite** | 9 pytest tests covering known ticker provenance, unindexed refusal, 404 handling, copilot honest refusal, boundary validation, SQLite persistence, evidence SHA-256 hashes, unified alerts, and SQLite exchange feed. |
+| **Automated Test Suite** | 10 pytest tests covering known ticker provenance, unindexed refusal, 404 handling, copilot honest refusal, boundary validation, SQLite persistence, evidence SHA-256 hashes, unified alerts, SQLite exchange feed, and strict cryptographic PDF provenance with verbatim quote matching. |
 
 ---
 
@@ -69,6 +69,10 @@ run.bat
 
 ### Run Verification Test Suite
 ```powershell
+# 1. Automated provenance & verbatim quote audit across 5 official PDF documents
+./venv/Scripts/python backend/verify_provenance.py
+
+# 2. Comprehensive pytest suite (isolated DB, 0 mutations to committed database)
 ./venv/Scripts/pytest backend/tests/test_provenance_and_integrity.py -v
 ```
-All 9 test assertions pass with 100% success rate.
+All 10 test assertions pass with 100% success rate.

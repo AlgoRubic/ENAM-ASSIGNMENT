@@ -205,7 +205,7 @@ def get_alerts(
                 alert_type="MATERIAL_FILING",
                 headline=f"Material Filing ({item['category'].upper()}): {item['company_name']}",
                 detail=item["summary_one_liner"],
-                timestamp=f"{item['timestamp_hours_ago']}h ago",
+                timestamp=item.get("filing_date", "October 2024"),
                 hours_ago=item["timestamp_hours_ago"],
                 category=item["category"],
                 source_url=item.get("source_url"),

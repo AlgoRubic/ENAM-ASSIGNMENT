@@ -32,10 +32,10 @@ export default function PushFeed({
   }
 
   const windows = [
-    { label: '24h', value: 24, description: 'Today' },
-    { label: '48h', value: 48, description: '2 Days' },
-    { label: '7D', value: 168, description: 'Weekly Review' },
-    { label: 'All', value: 720, description: 'Full History' },
+    { label: 'Q2 Peak', value: 24, description: 'Earnings Day' },
+    { label: '48h Window', value: 48, description: '48h Window' },
+    { label: 'Season (7D)', value: 168, description: 'Earnings Week' },
+    { label: 'All Q2 FY25', value: 720, description: 'Full Window' },
   ];
 
   const getTimelineSummary = () => {
@@ -43,23 +43,23 @@ export default function PushFeed({
     const totalAlerts = alerts?.length || 0;
     if (windowHours <= 24) {
       return {
-        title: "Today's Intraday & Overnight Feed",
-        sub: `${totalAlerts} triggered alerts • ${totalEvents} material exchange filings.`
+        title: "Historical Q2 FY25 Ingestion Window (Peak Disclosures)",
+        sub: `${totalAlerts} triggered alerts • ${totalEvents} verified primary filings from Q2 FY25 earnings season.`
       };
     } else if (windowHours <= 48) {
       return {
-        title: "Trailing 48-Hour Digest",
-        sub: `${totalAlerts} triggered alerts • ${totalEvents} disclosures including yesterday's close.`
+        title: "Historical Q2 FY25 Disclosures (48h Window)",
+        sub: `${totalAlerts} triggered alerts • ${totalEvents} disclosures including concall transcripts & board outcomes.`
       };
     } else if (windowHours <= 168) {
       return {
-        title: "Weekly Portfolio Review (7 Days)",
-        sub: `${totalAlerts} triggered alerts • ${totalEvents} material corporate actions across the portfolio.`
+        title: "Historical Q2 FY25 Earnings Week Review",
+        sub: `${totalAlerts} triggered alerts • ${totalEvents} material corporate actions across the indexed portfolio.`
       };
     }
     return {
-      title: "Cumulative Corporate Timeline",
-      sub: `Full archive: ${totalAlerts} threshold alerts • ${totalEvents} verified disclosures.`
+      title: "Historical Q2 FY25 Audit & Filing Window (As of Nov 2024)",
+      sub: `Cryptographic archive: ${totalAlerts} threshold alerts • ${totalEvents} verified regulatory disclosures (Ended Sep 30, 2024).`
     };
   };
 

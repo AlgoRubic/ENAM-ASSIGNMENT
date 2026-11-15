@@ -13,8 +13,16 @@ DB_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(DB_DIR, "finn.db")
 
 
+def get_db_path() -> str:
+    """Returns active database path, allowing test isolation via FINN_DB_PATH."""
+    return os.environ.get("FINN_DB_PATH", DB_PATH)
+
+
 def get_db_connection() -> sqlite3.Connection:
-    conn = sqlite3.connect(DB_PATH)
+    path = get_db_path()
+    if path != ":memory:" and not os.path.exists(os.path.dirname(path)) and os.path.dirname(path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+    conn = sqlite3.connect(path)
     conn.row_factory = sqlite3.Row
     return conn
 

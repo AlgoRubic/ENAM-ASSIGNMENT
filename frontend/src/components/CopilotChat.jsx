@@ -3,15 +3,18 @@ import { ArrowUp, ShieldCheck } from 'lucide-react';
 import { askCopilot } from '../services/api';
 
 export default function CopilotChat({ selectedSymbol }) {
+  const isIndexed = ['ZOMATO.NS', 'TATAMOTORS.NS', 'RELIANCE.NS'].includes(selectedSymbol);
   const [messages, setMessages] = useState([
     {
       id: 'init-1',
       sender: 'bot',
-      text: `Primary Research Terminal active for ${selectedSymbol || "ZOMATO.NS"}.\n\nAll queries are verified against audited Annual Reports, quarterly exchange filings, and earnings call transcripts. Broker commentary and news sentiment are excluded.\n\nSelect a prompt below or enter an investigation query.`,
-      takeaway: 'Grounded strictly in primary exchange records.',
-      citations: [
+      text: isIndexed
+        ? `Primary Research Terminal active for ${selectedSymbol || "ZOMATO.NS"}.\n\nAll queries are verified against audited Annual Reports, quarterly exchange filings, and earnings call transcripts. Broker commentary and news sentiment are excluded.\n\nSelect a prompt below or enter an investigation query.`
+        : `Primary Research Terminal active for ${selectedSymbol}.\n\nNotice: This company has not yet been indexed in the primary regulatory document store. The system strictly provides real-time market data and refuses to fabricate guidance or financial metrics.\n\nIndexed companies with full primary document provenance: ZOMATO.NS, TATAMOTORS.NS, RELIANCE.NS.`,
+      takeaway: isIndexed ? 'Grounded strictly in primary exchange records.' : 'Market data only; no synthetic guidance.',
+      citations: isIndexed ? [
         { doc_type: 'Annual Report FY24 & Q2 FY25 Filings', period: 'FY24-FY25', page_or_time: 'Regulatory Disclosure', exact_quote: 'Direct extraction from verified exchange filings.' }
-      ]
+      ] : []
     }
   ]);
   const [input, setInput] = useState('');
@@ -77,12 +80,14 @@ export default function CopilotChat({ selectedSymbol }) {
       {/* Status Bar */}
       <div className="flex items-center justify-between px-1 py-2 text-xs text-[#86868b]">
         <div className="flex items-center gap-1.5 font-medium text-white/90">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#30d158]"></span>
+          <span className={`w-1.5 h-1.5 rounded-full ${isIndexed ? 'bg-[#30d158]' : 'bg-[#ff9f0a]'}`}></span>
           <span>{selectedSymbol}</span>
         </div>
-        <div className="flex items-center gap-1 text-[11px] text-[#515156]">
-          <ShieldCheck className="w-3 h-3 text-[#30d158]" />
-          <span>Primary Grounded</span>
+        <div className="flex items-center gap-1 text-[11px]">
+          <ShieldCheck className={`w-3 h-3 ${isIndexed ? 'text-[#30d158]' : 'text-[#ff9f0a]'}`} />
+          <span className={isIndexed ? 'text-[#86868b]' : 'text-[#ff9f0a]'}>
+            {isIndexed ? 'Primary Grounded' : 'Market Data Only'}
+          </span>
         </div>
       </div>
 
