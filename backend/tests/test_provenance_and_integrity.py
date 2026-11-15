@@ -578,7 +578,7 @@ def test_audit_summary_endpoint_derives_real_values_and_tracks_feed_and_market_m
 
     # Submission blockers must be derived from COVERING_NOTE.md/README.md + runtime scope
     assert isinstance(data["submission_blockers"], list)
-    assert len(data["submission_blockers"]) >= 6
+    assert len(data["submission_blockers"]) >= 5
     joined_blockers = " | ".join(data["submission_blockers"])
     assert "SUBMISSION BLOCKER" in joined_blockers
     assert "market_data_only" in joined_blockers

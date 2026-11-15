@@ -14,8 +14,8 @@ This repository was built iteratively with an AI coding agent and reviewed again
 
 ## Conversation links
 
-The public share/export links for the coding-agent and LLM conversations must be inserted here before submission. They are intentionally not fabricated.
+Both build conversations must be linked in the final email. The URLs below are intentionally left for the candidate to paste because private chat URLs cannot be fabricated or inferred.
 
-- [SUBMISSION BLOCKER: Insert public AI session link 1]
-- [SUBMISSION BLOCKER: Insert public AI session link 2]
+- **Codex / ChatGPT build conversation:** [SUBMISSION BLOCKER: Paste the public Codex/ChatGPT share link]
+- **Antigravity build conversation (Evidence Health Panel Implementation):** [SUBMISSION BLOCKER: Paste the public Antigravity export/share link]
 

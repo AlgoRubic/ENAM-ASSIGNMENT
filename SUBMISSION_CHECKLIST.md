@@ -5,7 +5,8 @@
 - [x] Mobile-first responsive web prototype
 - [x] GitHub repository
 - [x] Short covering write-up
-- [ ] Public AI build-history/session links
+- [ ] Public Codex/ChatGPT build-conversation link
+- [ ] Public Antigravity build-conversation link
 - [ ] Candidate name and contact details
 - [ ] Permanent public demo URL (the current Cloudflare URL is temporary)
 

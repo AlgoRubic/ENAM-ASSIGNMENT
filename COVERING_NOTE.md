@@ -7,7 +7,7 @@
 > - **Candidate:** **[SUBMISSION BLOCKER: Insert Candidate Full Name & Contact]**
 > - **GitHub Repository:** **https://github.com/AlgoRubic/ENAM-ASSIGNMENT**
 > - **Deployed Mobile Demo:** **[SUBMISSION BLOCKER: Replace temporary URL with permanent deployed URL]** https://folder-sql-coral-certain.trycloudflare.com
-> - **AI Build History & Logs:** **[SUBMISSION BLOCKER: Insert Public Links to AI Session Logs / Transcripts]**
+> - **AI Build History & Logs:** **[SUBMISSION BLOCKER: Add both public chat links — Codex/ChatGPT and Antigravity — see AI_BUILD_HISTORY.md]**
 
 ---
 
