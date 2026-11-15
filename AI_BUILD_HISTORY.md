@@ -14,8 +14,12 @@ This repository was built iteratively with an AI coding agent and reviewed again
 
 ## Conversation links
 
-Both build conversations must be linked in the final email. The URLs below are intentionally left for the candidate to paste because private chat URLs cannot be fabricated or inferred.
+The ENAM brief asks for the coding-agent and LLM build history. The Codex thread has a public share link. Antigravity currently exposes this conversation only through its local app URL, so the exact conversation title and local identifier are recorded below rather than inventing a public URL.
 
-- **Codex / ChatGPT build conversation:** [SUBMISSION BLOCKER: Paste the public Codex/ChatGPT share link]
-- **Antigravity build conversation (Evidence Health Panel Implementation):** [SUBMISSION BLOCKER: Paste the public Antigravity export/share link]
+- **Codex / ChatGPT build conversation:** https://chatgpt.com/s/cx_6af97fc88cc081919b6098da68974588
+- **Antigravity build conversation:** `Evidence Health Panel Implementation` — local conversation URL: https://127.0.0.1:57598/c/88c45bc3-224d-4c79-89e7-e5f2536c1c3d?project=outside-of-project
+
+### Antigravity export note
+
+The Antigravity UI provides rename/pin/archive/split/copy actions but no public share/export action for this conversation. Before sending the email, open the conversation in Antigravity and use its available Copy/export workflow if the app exposes one in your environment; replace the local URL above with that public export link. The build record itself is preserved in this repository so the history is still reviewable.
 

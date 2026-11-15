@@ -3,11 +3,12 @@
 **Subject:** IIT Delhi – AI Engineer - 2027
 
 > [!WARNING]
-> **SUBMISSION BLOCKERS — REPLACE PLACEHOLDERS BELOW BEFORE SENDING TO `assessment@enam.com`:**
+> **SUBMISSION BLOCKERS — REPLACE THE REMAINING PERSONAL/DEPLOYMENT PLACEHOLDERS BEFORE SENDING TO `assessment@enam.com`:**
 > - **Candidate:** **[SUBMISSION BLOCKER: Insert Candidate Full Name & Contact]**
 > - **GitHub Repository:** **https://github.com/AlgoRubic/ENAM-ASSIGNMENT**
 > - **Deployed Mobile Demo:** **[SUBMISSION BLOCKER: Replace temporary URL with permanent deployed URL]** https://folder-sql-coral-certain.trycloudflare.com
-> - **AI Build History & Logs:** **[SUBMISSION BLOCKER: Add both public chat links — Codex/ChatGPT and Antigravity — see AI_BUILD_HISTORY.md]**
+> - **Codex / ChatGPT build history:** https://chatgpt.com/s/cx_6af97fc88cc081919b6098da68974588
+> - **Antigravity build history:** See `AI_BUILD_HISTORY.md` for the recorded `Evidence Health Panel Implementation` conversation and its local URL; replace it with a public Antigravity export link if your app provides one.
 
 ---
 
