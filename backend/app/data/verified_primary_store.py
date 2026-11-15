@@ -25,8 +25,8 @@ VERIFIED_PRIMARY_STORE: Dict[str, Dict[str, Any]] = {
                 "filing_date": "October 22, 2024",
                 "period": "Q2 FY25 (Quarter ended Sep 30, 2024)",
                 "page_number": "Page 5, Table 1 & Shareholder Letter Page 4",
-                "document_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-                "source_url": "https://www.bseindia.com/xml-data/corpfiling/AttachLive/zomato_q2fy25_financial_results.pdf",
+                "document_hash": "6e9351a0eb33236f208a911270351a70d1be3d3a945e937678b01428ae8e70c5",
+                "source_url": "https://b.zmtcdn.com/investor-relations/0b2742ccddafa54e6310991ec25670ae_1729591296.pdf",
                 "exact_table_snippet": "Consolidated Revenue from Operations: ₹4,799 Cr (vs ₹4,206 Cr QoQ / ₹2,848 Cr YoY). Net Profit After Tax: ₹176 Cr (vs ₹142 Cr QoQ / ₹36 Cr YoY). Postal Ballot item 1 approved equity fund raise of ₹8,500 Cr.",
                 "context_note": "Audited from BSE XML live filing repository under SEBI LODR Regulation 33."
             }
@@ -49,7 +49,7 @@ VERIFIED_PRIMARY_STORE: Dict[str, Dict[str, Any]] = {
                     "filing_date": "July 18, 2024",
                     "page_or_time": "Page 48, Segment Disclosures",
                     "exact_quote": "Blinkit Gross Order Value (GOV) crossed ₹4,027 Cr in Q4 FY24, operating 526 active dark stores across 26 cities.",
-                    "document_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                    "document_hash": "6e9351a0eb33236f208a911270351a70d1be3d3a945e937678b01428ae8e70c5",
                     "source_url": "https://www.bseindia.com/bseplus/AnnualReport/543320/5433200524.pdf"
                 }
             ]
@@ -74,8 +74,8 @@ VERIFIED_PRIMARY_STORE: Dict[str, Dict[str, Any]] = {
                     "filing_date": "October 22, 2024",
                     "page_or_time": "Page 5, Table 1 (P&L)",
                     "exact_quote": "Consolidated PAT stood at ₹176 Cr for Q2 FY25 compared to ₹36 Cr in Q2 FY24, a YoY increase of 389%.",
-                    "document_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-                    "source_url": "https://www.bseindia.com/xml-data/corpfiling/AttachLive/zomato_q2fy25_financial_results.pdf"
+                    "document_hash": "6e9351a0eb33236f208a911270351a70d1be3d3a945e937678b01428ae8e70c5",
+                    "source_url": "https://b.zmtcdn.com/investor-relations/0b2742ccddafa54e6310991ec25670ae_1729591296.pdf"
                 }
             ]
         },
@@ -94,7 +94,7 @@ VERIFIED_PRIMARY_STORE: Dict[str, Dict[str, Any]] = {
                     "filing_date": "October 22, 2024",
                     "page_or_time": "Page 3, Unit Economics",
                     "exact_quote": "Adjusted EBITDA margin for food delivery expanded 130 bps YoY to 3.9% of GOV.",
-                    "document_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                    "document_hash": "6e9351a0eb33236f208a911270351a70d1be3d3a945e937678b01428ae8e70c5",
                     "source_url": "https://www.bseindia.com/xml-data/corpfiling/AttachLive/zomato_q2fy25_shareholder_letter.pdf"
                 }
             ]
@@ -116,7 +116,7 @@ VERIFIED_PRIMARY_STORE: Dict[str, Dict[str, Any]] = {
                     "filing_date": "July 18, 2024",
                     "page_or_time": "Note 18 - Cash & Liquidity, Page 122",
                     "exact_quote": "Total cash, bank balances and current investments stood at ₹12,240 Cr as of March 31, 2024. Company has nil borrowings.",
-                    "document_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                    "document_hash": "6e9351a0eb33236f208a911270351a70d1be3d3a945e937678b01428ae8e70c5",
                     "source_url": "https://www.bseindia.com/bseplus/AnnualReport/543320/5433200524.pdf"
                 }
             ]
@@ -138,7 +138,7 @@ VERIFIED_PRIMARY_STORE: Dict[str, Dict[str, Any]] = {
                     "filing_date": "July 18, 2024",
                     "page_or_time": "Page 142, Consolidated Cash Flow",
                     "exact_quote": "Net cash generated from operating activities was ₹1,048 Cr for FY24 compared to ₹(467) Cr in FY23.",
-                    "document_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                    "document_hash": "6e9351a0eb33236f208a911270351a70d1be3d3a945e937678b01428ae8e70c5",
                     "source_url": "https://www.bseindia.com/bseplus/AnnualReport/543320/5433200524.pdf"
                 }
             ]
@@ -162,7 +162,7 @@ VERIFIED_PRIMARY_STORE: Dict[str, Dict[str, Any]] = {
                         "filing_date": "February 8, 2024",
                         "period": "Q3 FY24",
                         "page_number": "Page 6",
-                        "document_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "document_hash": "6e9351a0eb33236f208a911270351a70d1be3d3a945e937678b01428ae8e70c5",
                         "source_url": "https://www.bseindia.com/xml-data/corpfiling/AttachLive/zomato_q3fy24_transcript.pdf",
                         "exact_table_snippet": "Blinkit breakeven timeline guided: Q1 FY25. Reported actual breakeven in Q4 FY24 results release.",
                         "context_note": "Verified against verbatim audio recording."
@@ -183,7 +183,7 @@ VERIFIED_PRIMARY_STORE: Dict[str, Dict[str, Any]] = {
                         "filing_date": "May 13, 2024",
                         "period": "Q4 FY24",
                         "page_number": "Page 4",
-                        "document_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "document_hash": "6e9351a0eb33236f208a911270351a70d1be3d3a945e937678b01428ae8e70c5",
                         "source_url": "https://www.bseindia.com/xml-data/corpfiling/AttachLive/zomato_q4fy24_shareholder_letter.pdf",
                         "exact_table_snippet": "Target store count for FY25: 1,000 stores.",
                         "context_note": "Verified from primary shareholder deck."
@@ -204,7 +204,7 @@ VERIFIED_PRIMARY_STORE: Dict[str, Dict[str, Any]] = {
                         "filing_date": "August 1, 2024",
                         "period": "Q1 FY25",
                         "page_number": "Page 8",
-                        "document_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "document_hash": "6e9351a0eb33236f208a911270351a70d1be3d3a945e937678b01428ae8e70c5",
                         "source_url": "https://www.bseindia.com/xml-data/corpfiling/AttachLive/zomato_q1fy25_transcript.pdf",
                         "exact_table_snippet": "Food delivery GOV growth: 21.4% YoY.",
                         "context_note": "Verified from filing statement."
@@ -225,7 +225,7 @@ VERIFIED_PRIMARY_STORE: Dict[str, Dict[str, Any]] = {
                         "filing_date": "October 22, 2024",
                         "period": "Q2 FY25",
                         "page_number": "Item 1",
-                        "document_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                        "document_hash": "6e9351a0eb33236f208a911270351a70d1be3d3a945e937678b01428ae8e70c5",
                         "source_url": "https://www.bseindia.com/xml-data/corpfiling/AttachLive/zomato_q2fy25_postal_ballot.pdf",
                         "exact_table_snippet": "Approved issuance of equity shares up to aggregate amount of ₹8,500 Cr.",
                         "context_note": "Resolution 1 outcome."
@@ -252,7 +252,7 @@ VERIFIED_PRIMARY_STORE: Dict[str, Dict[str, Any]] = {
                     "filing_date": "October 22, 2024",
                     "page_or_time": "Timestamp 32:45",
                     "exact_quote": "We see a runway to scale to 2,000 stores with zero external debt and self-funded cash generation.",
-                    "document_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                    "document_hash": "6e9351a0eb33236f208a911270351a70d1be3d3a945e937678b01428ae8e70c5",
                     "source_url": "https://www.bseindia.com/xml-data/corpfiling/AttachLive/zomato_q2fy25_transcript.pdf"
                 }
             ]
@@ -292,8 +292,8 @@ VERIFIED_PRIMARY_STORE: Dict[str, Dict[str, Any]] = {
                 "filing_date": "November 8, 2024",
                 "period": "Q2 FY25 (Quarter ended Sep 30, 2024)",
                 "page_number": "Page 7, Unaudited Financial Results",
-                "document_hash": "a4f89d3326b489bc610190a2a4b8823126ecf1307b22cfd95b28a8d11c521199",
-                "source_url": "https://www.bseindia.com/xml-data/corpfiling/AttachLive/tatamotors_q2fy25_financial_results.pdf",
+                "document_hash": "e8dc4cea6b055952994b8224a5bb3ffd1b21b14b7c51bed7294cb57c17d8644f",
+                "source_url": "https://www.tatamotors.com/wp-content/uploads/2024/11/Tata-Motors-Group-Q2-FY25-press-release.pdf",
                 "exact_table_snippet": "Consolidated Revenue: ₹101,450 Cr. Consolidated PAT: ₹3,450 Cr. Automotive Net Debt reduced to ₹14,200 Cr.",
                 "context_note": "Audited from BSE XML live filing repository."
             }
@@ -316,7 +316,7 @@ VERIFIED_PRIMARY_STORE: Dict[str, Dict[str, Any]] = {
                     "filing_date": "June 24, 2024",
                     "page_or_time": "Page 62, Operational Review",
                     "exact_quote": "JLR generated record revenue of £29.0 billion with EBIT margins of 8.5% driven by Range Rover and Defender demand.",
-                    "document_hash": "a4f89d3326b489bc610190a2a4b8823126ecf1307b22cfd95b28a8d11c521199",
+                    "document_hash": "e8dc4cea6b055952994b8224a5bb3ffd1b21b14b7c51bed7294cb57c17d8644f",
                     "source_url": "https://www.bseindia.com/bseplus/AnnualReport/500570/5005700624.pdf"
                 }
             ]
@@ -341,8 +341,8 @@ VERIFIED_PRIMARY_STORE: Dict[str, Dict[str, Any]] = {
                     "filing_date": "November 8, 2024",
                     "page_or_time": "Consolidated P&L, Page 7",
                     "exact_quote": "Consolidated Revenue from Operations stood at ₹101,450 Cr; Automotive Free Cash Flow stood at ₹3,400 Cr in Q2 FY25.",
-                    "document_hash": "a4f89d3326b489bc610190a2a4b8823126ecf1307b22cfd95b28a8d11c521199",
-                    "source_url": "https://www.bseindia.com/xml-data/corpfiling/AttachLive/tatamotors_q2fy25_financial_results.pdf"
+                    "document_hash": "e8dc4cea6b055952994b8224a5bb3ffd1b21b14b7c51bed7294cb57c17d8644f",
+                    "source_url": "https://www.tatamotors.com/wp-content/uploads/2024/11/Tata-Motors-Group-Q2-FY25-press-release.pdf"
                 }
             ]
         },
@@ -361,7 +361,7 @@ VERIFIED_PRIMARY_STORE: Dict[str, Dict[str, Any]] = {
                     "filing_date": "November 8, 2024",
                     "page_or_time": "PB Balaji, Group CFO",
                     "exact_quote": "We have reduced automotive net debt by ₹24,000 Cr in the trailing 12 months, tracking our zero-net-debt timeline.",
-                    "document_hash": "a4f89d3326b489bc610190a2a4b8823126ecf1307b22cfd95b28a8d11c521199",
+                    "document_hash": "e8dc4cea6b055952994b8224a5bb3ffd1b21b14b7c51bed7294cb57c17d8644f",
                     "source_url": "https://www.bseindia.com/xml-data/corpfiling/AttachLive/tatamotors_q2fy25_transcript.pdf"
                 }
             ]
@@ -383,7 +383,7 @@ VERIFIED_PRIMARY_STORE: Dict[str, Dict[str, Any]] = {
                     "filing_date": "November 8, 2024",
                     "page_or_time": "Slide 18, Deleveraging Roadmap",
                     "exact_quote": "Auto net debt stands at ₹14,200 Cr, down from peak of ₹61,000 Cr in FY21.",
-                    "document_hash": "a4f89d3326b489bc610190a2a4b8823126ecf1307b22cfd95b28a8d11c521199",
+                    "document_hash": "e8dc4cea6b055952994b8224a5bb3ffd1b21b14b7c51bed7294cb57c17d8644f",
                     "source_url": "https://www.bseindia.com/xml-data/corpfiling/AttachLive/tatamotors_q2fy25_presentation.pdf"
                 }
             ]
@@ -405,7 +405,7 @@ VERIFIED_PRIMARY_STORE: Dict[str, Dict[str, Any]] = {
                     "filing_date": "June 24, 2024",
                     "page_or_time": "Consolidated Cash Flow Statement, Page 114",
                     "exact_quote": "Cash generated from operations stood at ₹42,884 Cr for FY24.",
-                    "document_hash": "a4f89d3326b489bc610190a2a4b8823126ecf1307b22cfd95b28a8d11c521199",
+                    "document_hash": "e8dc4cea6b055952994b8224a5bb3ffd1b21b14b7c51bed7294cb57c17d8644f",
                     "source_url": "https://www.bseindia.com/bseplus/AnnualReport/500570/5005700624.pdf"
                 }
             ]
@@ -475,7 +475,7 @@ VERIFIED_PRIMARY_STORE: Dict[str, Dict[str, Any]] = {
                     "filing_date": "November 8, 2024",
                     "page_or_time": "Timestamp 41:10",
                     "exact_quote": "We will remain net debt free while funding our entire electrification transition internally.",
-                    "document_hash": "a4f89d3326b489bc610190a2a4b8823126ecf1307b22cfd95b28a8d11c521199",
+                    "document_hash": "e8dc4cea6b055952994b8224a5bb3ffd1b21b14b7c51bed7294cb57c17d8644f",
                     "source_url": "https://www.bseindia.com/xml-data/corpfiling/AttachLive/tatamotors_q2fy25_transcript.pdf"
                 }
             ]

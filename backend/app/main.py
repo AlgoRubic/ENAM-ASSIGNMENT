@@ -35,8 +35,10 @@ from app.db.storage import (
     get_cached_portfolio,
     upsert_market_cache,
     get_stored_thresholds,
-    update_stored_thresholds
+    update_stored_thresholds,
+    get_stored_announcements
 )
+from fastapi.staticfiles import StaticFiles
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("finn.app")
@@ -49,6 +51,11 @@ app = FastAPI(
 
 # Initialize database on startup
 init_db()
+
+# Mount local verified documents directory if present
+DOCUMENTS_DIR = os.path.join(os.path.dirname(__file__), "data", "documents")
+if os.path.exists(DOCUMENTS_DIR):
+    app.mount("/api/documents/download", StaticFiles(directory=DOCUMENTS_DIR), name="documents")
 
 # Safe and compliant CORS policy (avoids wildcard with credentials)
 app.add_middleware(
@@ -129,6 +136,16 @@ def get_digest(
         selected_symbols=symbols
     )
     return digest
+
+
+@app.get("/api/push/feed/db")
+def get_announcements_feed_endpoint(symbol: Optional[str] = Query(None)):
+    """
+    Returns verified exchange announcements ingested into SQLite announcements_feed table.
+    Stores filing ID, original URL, publication timestamp, fetch timestamp, document hash, and extraction status.
+    """
+    feed = get_stored_announcements(symbol)
+    return {"count": len(feed), "feed": feed}
 
 
 @app.get("/api/push/alerts")

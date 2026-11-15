@@ -51,6 +51,25 @@ def init_db():
             )
         """)
 
+        # Verified exchange announcement feed table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS announcements_feed (
+                filing_id TEXT PRIMARY KEY,
+                symbol TEXT,
+                company_name TEXT,
+                category TEXT,
+                title TEXT,
+                summary TEXT,
+                original_url TEXT,
+                publication_timestamp TEXT,
+                fetch_timestamp TEXT,
+                document_hash TEXT,
+                extraction_status TEXT,
+                priority INTEGER,
+                is_material INTEGER
+            )
+        """)
+
         # Insert defaults if not present
         cursor.execute("INSERT OR IGNORE INTO threshold_config (key, val, updated_at) VALUES ('volume_multiplier', 2.0, ?)", (time.time(),))
         cursor.execute("INSERT OR IGNORE INTO threshold_config (key, val, updated_at) VALUES ('price_change_pct', 3.0, ?)", (time.time(),))
@@ -109,3 +128,47 @@ def upsert_market_cache(symbol: str, name: str, sector: str, cap: str, metric: D
             now
         ))
         conn.commit()
+
+
+def record_announcement_feed(
+    filing_id: str,
+    symbol: str,
+    company_name: str,
+    category: str,
+    title: str,
+    summary: str,
+    original_url: str,
+    publication_timestamp: str,
+    fetch_timestamp: str,
+    document_hash: str,
+    extraction_status: str = "VERIFIED_EXTRACTED",
+    priority: int = 1,
+    is_material: bool = True
+):
+    init_db()
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT OR REPLACE INTO announcements_feed
+            (filing_id, symbol, company_name, category, title, summary, original_url,
+             publication_timestamp, fetch_timestamp, document_hash, extraction_status, priority, is_material)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            filing_id, symbol, company_name, category, title, summary, original_url,
+            publication_timestamp, fetch_timestamp, document_hash, extraction_status,
+            priority, 1 if is_material else 0
+        ))
+        conn.commit()
+
+
+def get_stored_announcements(symbol: Optional[str] = None) -> List[Dict[str, Any]]:
+    init_db()
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        if symbol:
+            cursor.execute("SELECT * FROM announcements_feed WHERE symbol = ? ORDER BY publication_timestamp DESC", (symbol,))
+        else:
+            cursor.execute("SELECT * FROM announcements_feed ORDER BY priority ASC, publication_timestamp DESC")
+        rows = cursor.fetchall()
+        return [dict(row) for row in rows]
+

@@ -15,8 +15,50 @@ export default function NarrativeAuditView({
   portfolio = [],
   isLoading = false 
 }) {
-  if (isLoading || !analysis || !analysis.narrative_audit) {
+  if (isLoading || !analysis) {
     return <AuditSkeleton />;
+  }
+
+  // Honest refusal state for unindexed tickers
+  if (analysis.provenance_status === 'market_data_only' || !analysis.narrative_audit) {
+    return (
+      <div className="space-y-4 pb-24 smooth-fade-in">
+        {/* Ticker Selector */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+          {portfolio.map((stock) => {
+            const isSelected = selectedSymbol === stock.symbol;
+            return (
+              <button
+                key={stock.symbol}
+                onClick={() => onSelectSymbol(stock.symbol)}
+                className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs transition-all active:scale-95 ${
+                  isSelected
+                    ? 'bg-white text-black font-semibold shadow-sm'
+                    : 'bg-[#1c1c1e] text-[#86868b] hover:text-white'
+                }`}
+              >
+                {stock.symbol.replace('.NS', '')}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="rounded-2xl bg-[#1c1c1e] border border-white/[0.08] p-6 space-y-3">
+          <div className="text-xs uppercase tracking-wider text-[#86868b] font-mono">
+            {analysis.symbol} • Narrative vs Numbers Audit
+          </div>
+          <h2 className="text-lg font-semibold text-white">
+            Primary Transcripts Not Yet Indexed
+          </h2>
+          <p className="text-sm text-[#a1a1a6] leading-relaxed">
+            Earnings concall transcripts and quarterly investor presentation audits are currently indexed for FINN benchmark holdings: <span className="text-white font-semibold">ZOMATO.NS</span>, <span className="text-white font-semibold">TATAMOTORS.NS</span>, and <span className="text-white font-semibold">RELIANCE.NS</span>.
+          </p>
+          <div className="p-3.5 rounded-xl bg-[#ff9f0a]/10 border border-[#ff9f0a]/20 text-xs text-[#ff9f0a] leading-relaxed">
+            FINN strictly enforces a zero-fabrication standard: management guidance promises, delivery verdicts, and credibility scores are never synthetically simulated without audited concall filings.
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const audit = analysis.narrative_audit;

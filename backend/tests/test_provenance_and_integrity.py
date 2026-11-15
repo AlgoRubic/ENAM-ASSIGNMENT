@@ -207,3 +207,19 @@ def test_unified_push_alerts_contain_both_anomalies_and_filings():
     for fa in filing_alerts:
         assert fa["category"] in ["results", "M&A", "management_change", "litigation"]
         assert len(fa["detail"]) > 10
+
+
+def test_exchange_announcement_feed_db():
+    """Verify SQLite announcements_feed stores filing ID, URL, publication date, hash, and status."""
+    res = client.get("/api/push/feed/db")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["count"] > 0
+    item0 = data["feed"][0]
+    assert "filing_id" in item0
+    assert "original_url" in item0
+    assert "publication_timestamp" in item0
+    assert "fetch_timestamp" in item0
+    assert "document_hash" in item0
+    assert len(item0["document_hash"]) == 64
+    assert item0["extraction_status"] == "VERIFIED_EXTRACTED"

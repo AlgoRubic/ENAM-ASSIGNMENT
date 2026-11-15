@@ -11,7 +11,9 @@ import {
   fetchPortfolio, 
   fetchDigest, 
   fetchAlerts, 
-  fetchCompanyAnalysis 
+  fetchCompanyAnalysis,
+  fetchThresholds,
+  saveThresholds
 } from './services/api';
 
 export default function App() {
@@ -37,12 +39,19 @@ export default function App() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  // Load Initial Portfolio
+  // Load Initial Portfolio and Persisted Thresholds from SQLite
   useEffect(() => {
     async function loadInitial() {
-      const pData = await fetchPortfolio();
+      const [pData, tData] = await Promise.all([
+        fetchPortfolio(),
+        fetchThresholds()
+      ]);
       setPortfolio(pData.portfolio || []);
       setAdHocTickers(pData.ad_hoc_tickers || []);
+      if (tData && !tData.error) {
+        if (tData.volume_multiplier) setVolumeThreshold(tData.volume_multiplier);
+        if (tData.price_change_pct) setPriceThreshold(tData.price_change_pct);
+      }
     }
     loadInitial();
   }, []);
@@ -75,9 +84,10 @@ export default function App() {
     loadAnalysis();
   }, [selectedSymbol]);
 
-  // Re-scan alerts when threshold settings are updated
+  // Re-scan alerts and persist threshold settings to SQLite backend
   const handleApplyThresholds = async (newVol, newPrice) => {
     setLoadingDigest(true);
+    await saveThresholds(newVol, newPrice);
     const aData = await fetchAlerts(newVol, newPrice, windowHours);
     setAlerts(aData.alerts || []);
     setTimeout(() => setLoadingDigest(false), 200);

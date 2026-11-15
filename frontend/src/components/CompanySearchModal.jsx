@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, X, ChevronRight } from 'lucide-react';
 
 export default function CompanySearchModal({ 
@@ -9,6 +9,17 @@ export default function CompanySearchModal({
   adHocTickers = [] 
 }) {
   const [query, setQuery] = useState('');
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -35,35 +46,44 @@ export default function CompanySearchModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xl flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <div className="w-full max-w-md bg-[#161618] border border-white/[0.1] rounded-t-3xl sm:rounded-3xl p-5 space-y-4 max-h-[85vh] flex flex-col shadow-2xl">
-        
+    <div 
+      className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xl flex items-end sm:items-center justify-center p-0 sm:p-4"
+      onClick={onClose}
+    >
+      <div 
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="search-modal-title"
+        className="w-full max-w-md bg-[#161618] border border-white/[0.1] rounded-t-3xl sm:rounded-3xl p-5 space-y-4 max-h-[85vh] flex flex-col shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Modal Top Bar */}
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-white">Search Stocks</h2>
+          <h2 id="search-modal-title" className="text-base font-semibold text-white">Search Stocks</h2>
           <button 
             onClick={onClose}
-            className="w-7 h-7 rounded-full bg-white/[0.08] text-[#86868b] hover:text-white flex items-center justify-center"
+            aria-label="Close search"
+            className="w-8 h-8 rounded-full bg-white/[0.08] text-[#86868b] hover:text-white flex items-center justify-center transition-colors"
           >
-            <X className="w-3.5 h-3.5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Apple Spotlight Search Bar */}
         <form onSubmit={handleCustomSubmit} className="relative">
-          <Search className="w-4 h-4 text-[#86868b] absolute left-3.5 top-3" />
+          <Search className="w-4 h-4 text-[#86868b] absolute left-3.5 top-3.5" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search company, ticker or sector (e.g. TCS, BEL)..."
             autoFocus
-            className="w-full bg-[#242426] border border-transparent focus:border-white/20 rounded-xl pl-10 pr-12 py-2.5 text-xs text-white placeholder-[#86868b] focus:outline-none transition-colors"
+            className="w-full bg-[#242426] border border-transparent focus:border-white/20 rounded-xl pl-10 pr-16 py-3 text-sm text-white placeholder-[#86868b] focus:outline-none transition-colors"
           />
           {query.trim() && (
             <button
               type="submit"
-              className="absolute right-2 top-1.5 px-2.5 py-1 rounded-lg bg-white text-black text-[11px] font-semibold"
+              className="absolute right-2 top-2 px-3 py-1.5 rounded-lg bg-white text-black text-xs font-semibold"
             >
               Open
             </button>
@@ -75,8 +95,8 @@ export default function CompanySearchModal({
           
           {/* Ad-Hoc Demo Tickers */}
           {filteredAdHoc.length > 0 && (
-            <div className="space-y-1">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-[#86868b] px-1">
+            <div className="space-y-1.5">
+              <span className="text-xs font-semibold uppercase tracking-wider text-[#86868b] px-1">
                 Ad-Hoc Demo Companies (Outside Portfolio)
               </span>
               <div className="space-y-1">
@@ -87,13 +107,13 @@ export default function CompanySearchModal({
                       onSelectSymbol(stock.symbol);
                       onClose();
                     }}
-                    className="w-full text-left p-3 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] flex items-center justify-between transition-colors group"
+                    className="w-full text-left p-3.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] flex items-center justify-between transition-colors group"
                   >
                     <div>
-                      <div className="text-xs font-semibold text-white">
+                      <div className="text-sm font-semibold text-white">
                         {stock.name}
                       </div>
-                      <div className="text-[11px] text-[#86868b]">
+                      <div className="text-xs text-[#86868b] mt-0.5">
                         {stock.symbol} • {stock.sector}
                       </div>
                     </div>
@@ -105,8 +125,8 @@ export default function CompanySearchModal({
           )}
 
           {/* Portfolio Companies */}
-          <div className="space-y-1">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-[#86868b] px-1">
+          <div className="space-y-1.5">
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#86868b] px-1">
               Portfolio Holdings ({filteredPortfolio.length})
             </span>
             <div className="space-y-1">
@@ -117,33 +137,35 @@ export default function CompanySearchModal({
                     onSelectSymbol(stock.symbol);
                     onClose();
                   }}
-                  className="w-full text-left p-3 rounded-xl bg-white/[0.02] hover:bg-white/[0.08] flex items-center justify-between transition-colors group"
+                  className="w-full text-left p-3.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] flex items-center justify-between transition-colors group"
                 >
                   <div>
-                    <div className="text-xs font-semibold text-white">
+                    <div className="text-sm font-semibold text-white">
                       {stock.name}
                     </div>
-                    <div className="text-[11px] text-[#86868b]">
+                    <div className="text-xs text-[#86868b] mt-0.5">
                       {stock.symbol} • {stock.sector}
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-xs font-semibold text-white tabular-numbers">
-                      ₹{stock.price?.toLocaleString('en-IN')}
-                    </div>
-                    <div className={`text-[10px] font-semibold tabular-numbers ${
-                      stock.change_pct >= 0 ? 'text-[#30d158]' : 'text-[#ff453a]'
-                    }`}>
-                      {stock.change_pct >= 0 ? '+' : ''}{stock.change_pct}%
-                    </div>
+                  <div className="text-right flex items-center gap-2">
+                    {stock.price && (
+                      <span className="text-xs font-mono font-medium text-white">
+                        ₹{stock.price.toLocaleString('en-IN')}
+                      </span>
+                    )}
+                    <ChevronRight className="w-4 h-4 text-[#515156] group-hover:text-white transition-colors" />
                   </div>
                 </button>
               ))}
             </div>
           </div>
 
+          {filteredPortfolio.length === 0 && filteredAdHoc.length === 0 && (
+            <div className="text-center py-8 text-xs text-[#86868b]">
+              No direct matches found. Press &ldquo;Open&rdquo; or Enter to query NSE ticker &ldquo;{query.toUpperCase()}&rdquo; dynamically.
+            </div>
+          )}
         </div>
-
       </div>
     </div>
   );
