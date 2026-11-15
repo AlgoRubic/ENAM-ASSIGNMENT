@@ -9,7 +9,8 @@
 - [ ] Public Antigravity build-conversation link (Antigravity currently exposes only a local conversation URL)
 - [x] Exported Antigravity transcript included (`AI_CHAT_TRANSCRIPT.md` and `AI_CHAT_TRANSCRIPT.jsonl`)
 - [ ] Candidate name and contact details
-- [ ] Permanent public demo URL (the current Cloudflare URL is temporary)
+- [x] Public production frontend URL: https://finn-investment-agent.beigetoad12.chatgpt.site
+- [ ] Permanent backend hosting (the current API bridge uses a Cloudflare tunnel and must remain running)
 
 ## Repository
 
@@ -20,6 +21,16 @@ https://github.com/AlgoRubic/ENAM-ASSIGNMENT
 - Codex / ChatGPT: https://chatgpt.com/s/cx_6af97fc88cc081919b6098da68974588
 - Antigravity: `Evidence Health Panel Implementation` — https://127.0.0.1:57598/c/88c45bc3-224d-4c79-89e7-e5f2536c1c3d?project=outside-of-project
 - Full Antigravity transcript: `AI_CHAT_TRANSCRIPT.md` (human-readable) and `AI_CHAT_TRANSCRIPT.jsonl` (raw log)
+
+## Live production frontend
+
+https://finn-investment-agent.beigetoad12.chatgpt.site
+
+The frontend is published on Sites hosting. It currently calls the FastAPI backend through this live API bridge:
+
+https://apart-customers-green-entertainment.trycloudflare.com/api
+
+Keep the local FastAPI process and Cloudflare API tunnel running until the backend is moved to a permanent API host.
 
 ## Current phone-test demo
 

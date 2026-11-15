@@ -6,7 +6,8 @@
 > **SUBMISSION BLOCKERS — REPLACE THE REMAINING PERSONAL/DEPLOYMENT PLACEHOLDERS BEFORE SENDING TO `assessment@enam.com`:**
 > - **Candidate:** **[SUBMISSION BLOCKER: Insert Candidate Full Name & Contact]**
 > - **GitHub Repository:** **https://github.com/AlgoRubic/ENAM-ASSIGNMENT**
-> - **Deployed Mobile Demo:** **[SUBMISSION BLOCKER: Replace temporary URL with permanent deployed URL]** https://folder-sql-coral-certain.trycloudflare.com
+> - **Deployed Mobile Demo:** https://finn-investment-agent.beigetoad12.chatgpt.site
+> - **API bridge (currently kept online through the local tunnel):** https://apart-customers-green-entertainment.trycloudflare.com/api
 > - **Codex / ChatGPT build history:** https://chatgpt.com/s/cx_6af97fc88cc081919b6098da68974588
 > - **Antigravity build history:** Main implementation history is included in `AI_CHAT_TRANSCRIPT.md` (and raw `AI_CHAT_TRANSCRIPT.jsonl`); see `AI_BUILD_HISTORY.md` for context and the local conversation identifier.
 

@@ -19,6 +19,11 @@ The ENAM brief asks for the coding-agent and LLM build history. Antigravity cont
 - **Codex / ChatGPT build conversation:** https://chatgpt.com/s/cx_6af97fc88cc081919b6098da68974588
 - **Antigravity build conversation:** `Evidence Health Panel Implementation` — local conversation URL: https://127.0.0.1:57598/c/88c45bc3-224d-4c79-89e7-e5f2536c1c3d?project=outside-of-project
 
+## Deployment
+
+- Production frontend: https://finn-investment-agent.beigetoad12.chatgpt.site
+- Current API bridge: https://apart-customers-green-entertainment.trycloudflare.com/api (the FastAPI process and tunnel must remain running until a permanent backend host is configured).
+
 ### Exported Antigravity transcript
 
 - Human-readable full transcript: [`AI_CHAT_TRANSCRIPT.md`](AI_CHAT_TRANSCRIPT.md) — 146 logged steps.
