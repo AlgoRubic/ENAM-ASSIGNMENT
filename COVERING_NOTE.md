@@ -3,8 +3,10 @@
 **Subject:** IIT Delhi – AI Engineer - 2027
 
 > [!WARNING]
-> **SUBMISSION BLOCKERS — REPLACE THE REMAINING PERSONAL/DEPLOYMENT PLACEHOLDERS BEFORE SENDING TO `assessment@enam.com`:**
-> - **Candidate:** **[SUBMISSION BLOCKER: Insert Candidate Full Name & Contact]**
+> **SUBMISSION NOTE — the live API bridge must remain running while reviewers test the prototype:**
+> - **Candidate:** **Sarthak Kumar Jha**
+> - **Entry No.:** **2023CE10871**
+> - **Email:** **ce1230871@iitd.ac.in**
 > - **GitHub Repository:** **https://github.com/AlgoRubic/ENAM-ASSIGNMENT**
 > - **Deployed Mobile Demo:** https://finn-investment-agent.beigetoad12.chatgpt.site
 > - **API bridge (currently kept online through the local tunnel):** https://apart-customers-green-entertainment.trycloudflare.com/api

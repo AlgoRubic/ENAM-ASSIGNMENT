@@ -8,7 +8,7 @@
 - [x] Public Codex/ChatGPT build-conversation link
 - [ ] Public Antigravity build-conversation link (Antigravity currently exposes only a local conversation URL)
 - [x] Exported Antigravity transcript included (`AI_CHAT_TRANSCRIPT.md` and `AI_CHAT_TRANSCRIPT.jsonl`)
-- [ ] Candidate name and contact details
+- [x] Candidate identity: Sarthak Kumar Jha, Entry No. 2023CE10871, ce1230871@iitd.ac.in (no phone number)
 - [x] Public production frontend URL: https://finn-investment-agent.beigetoad12.chatgpt.site
 - [ ] Permanent backend hosting (the current API bridge uses a Cloudflare tunnel and must remain running)
 
